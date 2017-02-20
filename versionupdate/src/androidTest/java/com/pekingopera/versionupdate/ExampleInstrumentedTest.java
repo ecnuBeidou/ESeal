@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.pekingopera.versionupdate", appContext.getPackageName());
+        assertEquals("com.pekingopera.versionupdate.test", appContext.getPackageName());
     }
 }

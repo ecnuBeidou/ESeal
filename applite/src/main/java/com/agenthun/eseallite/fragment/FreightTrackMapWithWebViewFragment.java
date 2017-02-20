@@ -15,6 +15,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
@@ -24,6 +29,7 @@ import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager2;
 import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.utils.LanguageUtil;
 import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.agenthun.eseallite.view.BottomSheetDialogView;
 import com.baidu.mapapi.map.BaiduMap;
@@ -60,7 +66,7 @@ import rx.schedulers.Schedulers;
  * @date 2017/2/15 10:53.
  */
 
-public class FreightTrackMapFragment extends Fragment {
+public class FreightTrackMapWithWebViewFragment extends Fragment {
     private static final String TAG = "FreightTrackMapFragment";
 
     private static final String ARGUMENT_FREIGHT_ID = "ARGUMENT_FREIGHT_ID";
@@ -87,6 +93,8 @@ public class FreightTrackMapFragment extends Fragment {
 
     @Bind(R.id.bmapView)
     MapView bmapView;
+    @Bind(R.id.webView)
+    WebView webView;
 
     private String mFreightId = null;
     private String mFreightName = null;
@@ -94,23 +102,25 @@ public class FreightTrackMapFragment extends Fragment {
     private LocationDetail mLocationDetail = null;
     private List<LocationDetail> mLocationDetailList = new ArrayList<>();
 
-    public static FreightTrackMapFragment newInstance(String id, String name) {
+    private boolean mUsingWebView = false;
+
+    public static FreightTrackMapWithWebViewFragment newInstance(String id, String name) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_FREIGHT_ID, id);
         arguments.putString(ARGUMENT_FREIGHT_NAME, name);
-        FreightTrackMapFragment fragment = new FreightTrackMapFragment();
+        FreightTrackMapWithWebViewFragment fragment = new FreightTrackMapWithWebViewFragment();
         fragment.setArguments(arguments);
         return fragment;
     }
 
-    public FreightTrackMapFragment() {
+    public FreightTrackMapWithWebViewFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_freight_track_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_freight_track_map_with_webview, container, false);
         ButterKnife.bind(this, view);
 
         mFreightId = getArguments().getString(ARGUMENT_FREIGHT_ID);
@@ -118,6 +128,13 @@ public class FreightTrackMapFragment extends Fragment {
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(mOnFabClickListener);
+
+        //根据当前系统语言设置加载不同的Map Ui
+        mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
+        setupMapUi(mUsingWebView);
+        if (mUsingWebView) {
+            setupWebView();
+        }
 
         mHandler = new Handler();
         return view;
@@ -133,7 +150,6 @@ public class FreightTrackMapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         bmapView.onResume();
-
         loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
     }
 
@@ -200,6 +216,24 @@ public class FreightTrackMapFragment extends Fragment {
             }
         }
     };
+
+    private void setupMapUi(boolean usingWebView) {
+        if (usingWebView) {
+            bmapView.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+        } else {
+            bmapView.setVisibility(View.VISIBLE);
+            webView.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupWebView() {
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setBuiltInZoomControls(true);
+    }
 
     /**
      * 设置百度地图属性
@@ -337,6 +371,135 @@ public class FreightTrackMapFragment extends Fragment {
 
         //设置中心点
         mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(lng, 16));
+    }
+
+    /**
+     * 加载轨迹数据至WebView Google地图
+     */
+    private void showWebViewMap(List<LocationDetail> locationDetails) {
+        if (locationDetails == null || locationDetails.size() == 0) return;
+
+        int countInCircle = 0;
+
+        webView.post(new Runnable() {
+            @Override
+            public void run() {
+                String data = buildHtmlMap();
+                webView.loadData(data, "text/html", "UTF-8");
+            }
+        });
+
+
+/*        List<LatLng> polylines = new ArrayList<>();
+        for (LocationDetail locationDetail :
+                locationDetails) {
+            if (locationDetail.isInvalid()) continue;
+
+            LatLng lng = locationDetail.getLatLng();
+            polylines.add(lng);
+
+            if (polylines.size() > 1) {
+                if (SpatialRelationUtil.isCircleContainsPoint(polylines.get(0), LOCATION_RADIUS, lng)) {
+                    countInCircle++;
+                }
+            }
+        }
+
+        Collections.reverse(polylines); //按时间正序
+
+        OverlayOptions markerOptions = null;
+
+        if (polylines.size() > 1) {
+            OverlayOptions polylineOptions = new PolylineOptions()
+                    .points(polylines)
+                    .width(8)
+                    .color(ContextCompat.getColor(getActivity(), R.color.red_500));
+            mVirtureRoad = (Polyline) mBaiduMap.addOverlay(polylineOptions);
+            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_car)).position(polylines.get(0)).rotate((float) getAngle(0));
+        } else {
+            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_car)).position(polylines.get(0));
+        }
+        mMoveMarker = (Marker) mBaiduMap.addOverlay(markerOptions);
+
+        //设置中心点
+        setBaiduMapAdaptedZoom(polylines);
+        if (polylines.size() > 1 && countInCircle < polylines.size() / 2) {
+            movingThread = new Thread(new MyThread());
+            movingThread.start();
+        }*/
+
+    }
+
+    private String buildHtmlSample() {
+        return "<html><body><font color='red'>hello baidu!</font></body></html>";
+    }
+
+    private String buildHtmlMap() {
+        StringBuffer html = new StringBuffer();
+
+        html.append("<!DOCTYPE html>");
+        html.append("<head>");
+        html.append("<meta charset='utf-8'>");
+        html.append("<style>");
+        html.append("#map {height: 100%;}");
+        html.append("html, body {height: 100%;margin: 0;padding: 0;}");
+        html.append("</style>");
+        html.append("</head>");
+        html.append("<body>");
+        html.append("<div id='map'></div>");
+        html.append("<script>");
+        html.append("var neighborhoods = [");
+        html.append("{lat: 52.511, lng: 13.447},");
+        html.append("{lat: 52.549, lng: 13.422},");
+        html.append("{lat: 52.497, lng: 13.396},");
+        html.append("{lat: 52.517, lng: 13.394}");
+        html.append("];");
+        html.append("var markers = [];");
+        html.append("var map;");
+        html.append("function initMap() {");
+        html.append("map = new google.maps.Map(document.getElementById('map'), {");
+        html.append("zoom: 12,");
+        html.append("center: {lat: 52.520, lng: 13.410}");
+        html.append("});");
+        html.append("drop();");
+        html.append("var flightPath = new google.maps.Polyline({");
+        html.append("path: neighborhoods,");
+        html.append("geodesic: true,");
+        html.append("strokeColor: '#FF0000',");
+        html.append("strokeOpacity: 1.0,");
+        html.append("strokeWeight: 2");
+        html.append("});");
+        html.append("flightPath.setMap(map);");
+        html.append("}");
+        html.append("function drop() {");
+        html.append("clearMarkers();");
+        html.append("for (var i = 0; i < neighborhoods.length; i++) {");
+        html.append("addMarkerWithTimeout(neighborhoods[i], i * 200);");
+        html.append("}");
+        html.append("}");
+        html.append("function addMarkerWithTimeout(position, timeout) {");
+        html.append("window.setTimeout(function() {");
+        html.append("markers.push(new google.maps.Marker({");
+        html.append("position: position,");
+        html.append("map: map,");
+        html.append("animation: google.maps.Animation.DROP");
+        html.append("}));");
+        html.append("}, timeout);");
+        html.append("}");
+        html.append("function clearMarkers() {");
+        html.append("for (var i = 0; i < markers.length; i++) {");
+        html.append("markers[i].setMap(null);");
+        html.append("}");
+        html.append("markers = [];");
+        html.append("}");
+        html.append("</script>");
+        html.append("<script async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAp2aNol3FhJypghIA2IUZIOkNTwo6YPbY&callback=initMap'></script>");
+        html.append("</body>");
+        html.append("</html>");
+
+        return html.toString();
     }
 
     /**
@@ -517,9 +680,13 @@ public class FreightTrackMapFragment extends Fragment {
 
                         @Override
                         public void onNext(List<LocationDetail> locationDetails) {
-                            clearLocationData();
                             mLocationDetailList = locationDetails;
-                            showBaiduMap(locationDetails);
+                            if (!mUsingWebView) {
+                                clearLocationData();
+                                showBaiduMap(locationDetails);
+                            } else {
+                                showWebViewMap(locationDetails);
+                            }
                         }
                     });
         } else {
@@ -541,9 +708,13 @@ public class FreightTrackMapFragment extends Fragment {
 
                         @Override
                         public void onNext(LocationDetail locationDetail) {
-                            clearLocationData();
                             mLocationDetail = locationDetail;
-                            showBaiduMap(locationDetail);
+                            if (!mUsingWebView) {
+                                clearLocationData();
+                                showBaiduMap(locationDetail);
+                            } else {
+                                showWebViewMap(Arrays.asList(locationDetail));
+                            }
                         }
                     });
         }
