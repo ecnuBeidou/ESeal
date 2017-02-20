@@ -279,19 +279,41 @@ public class RetrofitManager2 {
 
     //根据Token获取该货物的最新位置状态
     public Observable<LocationDetail> getFreightLocationObservable(String token, String id) {
-//        Observable<DeviceLocationInfos> deviceLocationInfos = RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST)
-//                .getBleDeviceLocationObservable(token, id);
-//
-//        return deviceLocationInfos.map(new Func1<DeviceLocationInfos, LocationDetail>() {
-//            @Override
-//            public LocationDetail call(DeviceLocationInfos deviceLocationInfos) {
-//                return new LocationDetail("2017/2/14 13:14", "0", new LatLng(40.6406300000, -73.8472210000));
-//            }
-//        });
+        Observable<DeviceLocationInfos> deviceLocationInfos = freightTrackWebService.getBeidouMasterDeviceLastLocation(token, id, LanguageUtil.getLanguage());
 
+        return deviceLocationInfos.map(new Func1<DeviceLocationInfos, LocationDetail>() {
+            @Override
+            public LocationDetail call(DeviceLocationInfos deviceLocationInfos) {
+                if (deviceLocationInfos != null
+                        && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
+                    DeviceLocation deviceLocation = deviceLocationInfos.getDetails().get(0); //最新位置点
+
+                    String reportTime = deviceLocation.getReportTime();
+                    String uploadType = deviceLocation.getUploadType();
+                    String securityLevel = deviceLocation.getSecurityLevel();
+                    String closedFlag = deviceLocation.getClosedFlag();
+                    String[] location = deviceLocation.getBaiduCoordinate().split(",");
+                    LatLng latLng = new LatLng(
+                            Double.parseDouble(location[0]),
+                            Double.parseDouble(location[1])
+                    );
+
+                    LocationDetail d = new LocationDetail(reportTime,
+                            uploadType,
+                            securityLevel,
+                            closedFlag,
+                            latLng);
+
+                    return d;
+                }
+                return null;
+            }
+        });
+
+/*        //构造测试数据
         return Observable
                 .just(new LocationDetail("2017/02/14 13:14:51", "0", "1", "1", new LatLng(45.6406300000, -73.8472210000)))
-                .delay(500, TimeUnit.MILLISECONDS);
+                .delay(500, TimeUnit.MILLISECONDS);*/
     }
 
     //根据Token获取该货物所选时间段的位置状态列表

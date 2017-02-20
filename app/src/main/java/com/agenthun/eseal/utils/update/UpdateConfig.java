@@ -3,8 +3,8 @@ package com.agenthun.eseal.utils.update;
 import android.content.Context;
 
 import com.agenthun.eseal.R;
-import com.agenthun.eseal.model.ResponseResult;
-import com.agenthun.eseal.model.Version;
+import com.agenthun.eseal.bean.update.ResponseResult;
+import com.agenthun.eseal.bean.update.Version;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.pekingopera.versionupdate.ParseData;

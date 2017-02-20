@@ -1,4 +1,4 @@
-package com.agenthun.eseal.model;
+package com.agenthun.eseal.bean.update;
 
 import com.google.gson.annotations.SerializedName;
 

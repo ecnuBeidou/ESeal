@@ -152,4 +152,10 @@ public interface FreightTrackWebService {
             @Query("containerId") String containerId,
             @Query("language") String language);
 
+    //根据implementID获取该货物最新的位置
+    @GET("GetLastImplementData")
+    Observable<DeviceLocationInfos> getBeidouMasterDeviceLastLocation(
+            @Query("token") String token,
+            @Query("implementID") String implementID,
+            @Query("language") String language);
 }

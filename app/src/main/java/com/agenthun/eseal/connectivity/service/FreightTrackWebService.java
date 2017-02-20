@@ -3,12 +3,9 @@ package com.agenthun.eseal.connectivity.service;
 import android.support.annotation.Nullable;
 
 import com.agenthun.eseal.bean.BeidouMasterDeviceInfos;
-import com.agenthun.eseal.bean.BeidouNfcDeviceInfos;
 import com.agenthun.eseal.bean.BleAndBeidouNfcDeviceInfos;
-import com.agenthun.eseal.bean.BleDeviceInfos;
 import com.agenthun.eseal.bean.DeviceLocationInfos;
 import com.agenthun.eseal.bean.User;
-import com.agenthun.eseal.bean.base.BleAndBeidouNfcDevice;
 import com.agenthun.eseal.bean.base.Result;
 
 import retrofit2.http.GET;
@@ -155,4 +152,10 @@ public interface FreightTrackWebService {
             @Query("containerId") String containerId,
             @Query("language") String language);
 
+    //根据implementID获取该货物最新的位置
+    @GET("GetLastImplementData")
+    Observable<DeviceLocationInfos> getBeidouMasterDeviceLastLocation(
+            @Query("token") String token,
+            @Query("implementID") String implementID,
+            @Query("language") String language);
 }

@@ -14,6 +14,8 @@ import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.fragment.ScanNfcDeviceFragment;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.PreferencesHelper;
+import com.pekingopera.versionupdate.UpdateHelper;
+import com.pekingopera.versionupdate.listener.ForceListener;
 
 import butterknife.ButterKnife;
 
@@ -45,6 +47,8 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
         attachDeviceFragment();
 
         supportPostponeEnterTransition();
+
+        checkUpdate();
     }
 
     private void attachDeviceFragment() {
@@ -79,5 +83,16 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
         PreferencesHelper.signOut(this, isSave);
         LoginActivity.start(this, isSave);
         ActivityCompat.finishAfterTransition(this);
+    }
+
+    private void checkUpdate() {
+        UpdateHelper.getInstance().setForceListener(new ForceListener() {
+            @Override
+            public void onUserCancel(boolean force) {
+                if (force) {
+                    finish();
+                }
+            }
+        }).check(this);
     }
 }

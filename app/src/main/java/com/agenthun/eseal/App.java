@@ -28,6 +28,9 @@ public class App extends Application {
         super.onCreate();
         mApplicationContext = this;
 
+        /***
+         * 初始化版本升级模块
+         */
         UpdateConfig.initGet(this);
 
         /***

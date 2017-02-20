@@ -1,4 +1,4 @@
-package com.agenthun.eseal.model;
+package com.agenthun.eseallite.bean.update;
 
 /**
  * Created by wayne on 9/22/2016.
