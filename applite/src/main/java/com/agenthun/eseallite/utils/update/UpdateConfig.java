@@ -3,8 +3,8 @@ package com.agenthun.eseallite.utils.update;
 import android.content.Context;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.bean.update.ResponseResult;
-import com.agenthun.eseallite.bean.update.Version;
+import com.agenthun.eseallite.model.ResponseResult;
+import com.agenthun.eseallite.model.Version;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.pekingopera.versionupdate.ParseData;
@@ -26,11 +26,7 @@ public class UpdateConfig {
     public static void initGet(Context context) {
         UpdateHelper.init(context);
 
-        if (UpdateHelper.getInstance() == null) {
-            UpdateHelper.init(context);
-        }
-
-        String url = "http://www.freight-track.com/update/updatecheck2.aspx";
+        String url = "http://www.freight-track.com/update/updatecheck3.aspx";
         UpdateHelper.getInstance()
                 .setMethod(RequestType.get)
                 .setCheckUrl(url)
