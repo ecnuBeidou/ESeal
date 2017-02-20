@@ -123,4 +123,5 @@
     <string name="text_time_picker_hour">Hour</string>
     <string name="text_time_picker_minute">Minute</string>
 
+    <string name="about">About</string>
 </resources>

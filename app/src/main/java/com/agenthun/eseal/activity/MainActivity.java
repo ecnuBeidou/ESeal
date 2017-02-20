@@ -203,9 +203,12 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_sign_out) {
-            signOut(true);
-            return true;
+        switch (id) {
+            case R.id.action_sign_out:
+                signOut(true);
+                return true;
+            case R.id.action_about:
+                break;
         }
 
         return super.onOptionsItemSelected(item);

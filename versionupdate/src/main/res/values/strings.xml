@@ -12,5 +12,5 @@
     <string name="jjdxm_update_installnow">立即安装</string>
     <string name="jjdxm_update_notnow">以后再说</string>
     <string name="jjdxm_update_ignore">忽略该版</string>
-    <string name="jjdxm_update_dialog_installapk">最新版本已下载, 是否安装?</string>
+    <string name="jjdxm_update_dialog_installapk">最新版本已下载, 是否安装 ?</string>
 </resources>

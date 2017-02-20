@@ -1,6 +1,7 @@
 package com.agenthun.eseallite;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.agenthun.eseallite.utils.update.UpdateConfig;
 
@@ -15,7 +16,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         UpdateConfig.initGet(this);
     }
 

@@ -15,6 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep public class * extends android.app.Application
 
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**

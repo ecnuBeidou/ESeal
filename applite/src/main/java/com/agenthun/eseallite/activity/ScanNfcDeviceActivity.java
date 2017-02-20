@@ -71,9 +71,12 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_sign_out) {
-            signOut(true);
-            return true;
+        switch (id) {
+            case R.id.action_sign_out:
+                signOut(true);
+                return true;
+            case R.id.action_about:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
