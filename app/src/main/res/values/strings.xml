@@ -6,7 +6,7 @@
 
     <string name="action_settings">设置</string>
 
-    <string name="prompt_account">用户名</string>
+    <string name="prompt_account">账号</string>
     <string name="prompt_password">密码</string>
     <string name="action_sign_in">登录</string>
     <string name="action_forget_password">无法登录?</string>

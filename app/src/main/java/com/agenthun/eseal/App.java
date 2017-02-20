@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Vibrator;
 
 import com.agenthun.eseal.utils.baidumap.LocationService;
+import com.agenthun.eseal.utils.update.UpdateConfig;
 import com.baidu.mapapi.SDKInitializer;
 
 /**
@@ -26,6 +27,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         mApplicationContext = this;
+
+        UpdateConfig.initGet(this);
 
         /***
          * 初始化定位sdk，建议在Application中创建

@@ -1,5 +1,6 @@
 package com.agenthun.eseallite.activity;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,10 +16,8 @@ import android.view.View;
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.fragment.FreightTrackGoogleMapFragment;
 import com.agenthun.eseallite.fragment.FreightTrackMapFragment;
-import com.agenthun.eseallite.fragment.FreightTrackMapWithWebViewFragment;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
-import com.agenthun.eseallite.utils.LanguageUtil;
 import com.baidu.mapapi.SDKInitializer;
 
 import butterknife.ButterKnife;
@@ -104,11 +103,11 @@ public class FreightTrackMapActivity extends AppCompatActivity {
 
     private void attachDeviceWithWebViewFragment() {
         FragmentManager supportFragmentManager = getSupportFragmentManager();
-        FreightTrackMapWithWebViewFragment fragment = (FreightTrackMapWithWebViewFragment) supportFragmentManager.findFragmentById(R.id.content_main);
-        if (fragment == null) {
-            fragment = FreightTrackMapWithWebViewFragment.newInstance(mFreight.getId(), mFreight.getName());
-            ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
-        }
+//        FreightTrackMapWithWebViewFragment fragment = (FreightTrackMapWithWebViewFragment) supportFragmentManager.findFragmentById(R.id.content_main);
+//        if (fragment == null) {
+//            fragment = FreightTrackMapWithWebViewFragment.newInstance(mFreight.getId(), mFreight.getName());
+//            ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
+//        }
     }
 
     @Override

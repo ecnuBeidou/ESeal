@@ -28,6 +28,8 @@ import com.agenthun.eseal.connectivity.manager.RetrofitManager;
 import com.agenthun.eseal.utils.ApiLevelHelper;
 import com.agenthun.eseal.utils.PreferencesHelper;
 import com.agenthun.eseal.view.BottomSheetDialogView;
+import com.pekingopera.versionupdate.UpdateHelper;
+import com.pekingopera.versionupdate.listener.ForceListener;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        checkUpdate();
     }
 
     @Override
@@ -217,5 +220,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void showFreightDataListByBottomSheet(String token, String containerId, final String containerNo, List<LocationDetail> details) {
         BottomSheetDialogView.show(MainActivity.this, containerNo, details);
+    }
+
+    private void checkUpdate() {
+        UpdateHelper.getInstance().setForceListener(new ForceListener() {
+            @Override
+            public void onUserCancel(boolean force) {
+                if (force) {
+                    finish();
+                }
+            }
+        }).check(this);
     }
 }
