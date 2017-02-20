@@ -49,8 +49,6 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
         attachDeviceFragment();
 
         supportPostponeEnterTransition();
-
-//        checkUpdate();
     }
 
     private void attachDeviceFragment() {

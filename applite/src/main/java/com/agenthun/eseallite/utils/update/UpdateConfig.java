@@ -3,8 +3,8 @@ package com.agenthun.eseallite.utils.update;
 import android.content.Context;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.model.ResponseResult;
-import com.agenthun.eseallite.model.Version;
+import com.agenthun.eseallite.bean.update.ResponseResult;
+import com.agenthun.eseallite.bean.update.Version;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.pekingopera.versionupdate.ParseData;
