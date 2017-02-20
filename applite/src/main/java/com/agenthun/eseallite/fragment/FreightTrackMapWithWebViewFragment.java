@@ -131,6 +131,7 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
 
         //根据当前系统语言设置加载不同的Map Ui
         mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
+//        mUsingWebView = true; //for test webviewMap
         setupMapUi(mUsingWebView);
         if (mUsingWebView) {
             setupWebView();
@@ -379,65 +380,40 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
     private void showWebViewMap(List<LocationDetail> locationDetails) {
         if (locationDetails == null || locationDetails.size() == 0) return;
 
-        int countInCircle = 0;
-
-        webView.post(new Runnable() {
-            @Override
-            public void run() {
-                String data = buildHtmlMap();
-                webView.loadData(data, "text/html", "UTF-8");
-            }
-        });
-
-
-/*        List<LatLng> polylines = new ArrayList<>();
+        final List<LatLng> polylines = new ArrayList<>();
         for (LocationDetail locationDetail :
                 locationDetails) {
             if (locationDetail.isInvalid()) continue;
 
             LatLng lng = locationDetail.getLatLng();
             polylines.add(lng);
-
-            if (polylines.size() > 1) {
-                if (SpatialRelationUtil.isCircleContainsPoint(polylines.get(0), LOCATION_RADIUS, lng)) {
-                    countInCircle++;
-                }
-            }
         }
 
         Collections.reverse(polylines); //按时间正序
 
-        OverlayOptions markerOptions = null;
-
-        if (polylines.size() > 1) {
-            OverlayOptions polylineOptions = new PolylineOptions()
-                    .points(polylines)
-                    .width(8)
-                    .color(ContextCompat.getColor(getActivity(), R.color.red_500));
-            mVirtureRoad = (Polyline) mBaiduMap.addOverlay(polylineOptions);
-            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_car)).position(polylines.get(0)).rotate((float) getAngle(0));
-        } else {
-            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_car)).position(polylines.get(0));
-        }
-        mMoveMarker = (Marker) mBaiduMap.addOverlay(markerOptions);
-
-        //设置中心点
-        setBaiduMapAdaptedZoom(polylines);
-        if (polylines.size() > 1 && countInCircle < polylines.size() / 2) {
-            movingThread = new Thread(new MyThread());
-            movingThread.start();
-        }*/
-
+        webView.post(new Runnable() {
+            @Override
+            public void run() {
+                String data = buildHtmlMap(polylines);
+//                String data = buildHtmlSample();
+                webView.loadData(data, "text/html", "UTF-8");
+            }
+        });
     }
 
     private String buildHtmlSample() {
         return "<html><body><font color='red'>hello baidu!</font></body></html>";
     }
 
-    private String buildHtmlMap() {
+    private String buildHtmlMap(List<LatLng> polylines) {
         StringBuffer html = new StringBuffer();
+
+        double minLat = polylines.get(0).latitude;
+        double maxLat = polylines.get(0).latitude;
+        double minLng = polylines.get(0).longitude;
+        double maxLng = polylines.get(0).longitude;
+
+        LatLng point;
 
         html.append("<!DOCTYPE html>");
         html.append("<head>");
@@ -451,17 +427,33 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
         html.append("<div id='map'></div>");
         html.append("<script>");
         html.append("var neighborhoods = [");
-        html.append("{lat: 52.511, lng: 13.447},");
-        html.append("{lat: 52.549, lng: 13.422},");
-        html.append("{lat: 52.497, lng: 13.396},");
-        html.append("{lat: 52.517, lng: 13.394}");
+
+        html.append("{lat: " + minLat + ", lng: " + minLng + "},");
+
+        for (int i = 1; i < polylines.size(); i++) {
+            point = polylines.get(i);
+            if (point.latitude < minLat) minLat = point.latitude;
+            if (point.latitude > maxLat) maxLat = point.latitude;
+            if (point.longitude < minLng) minLng = point.longitude;
+            if (point.longitude > maxLng) maxLng = point.longitude;
+
+            html.append("{lat: " + point.latitude + ", lng: " + point.longitude + "},");
+        }
+
+        //设置中心点,以及缩放参数
+        double centerLat = (maxLat + minLat) / 2;
+        double centerLng = (maxLng + minLng) / 2;
+        int zoom = getGoogleMapZoom(minLat, maxLat, minLng, maxLng);
+
+        html.deleteCharAt(html.lastIndexOf(","));
+
         html.append("];");
         html.append("var markers = [];");
         html.append("var map;");
         html.append("function initMap() {");
         html.append("map = new google.maps.Map(document.getElementById('map'), {");
-        html.append("zoom: 12,");
-        html.append("center: {lat: 52.520, lng: 13.410}");
+        html.append("zoom: " + zoom + ",");
+        html.append("center: {lat: " + centerLat + ", lng: " + centerLng + "}");
         html.append("});");
         html.append("drop();");
         html.append("var flightPath = new google.maps.Polyline({");
@@ -551,6 +543,29 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
             }
         }
         return 16;
+    }
+
+    /**
+     * 获取Google地图显示等级
+     * 范围0-18级
+     */
+    private int getGoogleMapZoom(double minLat, double maxLat, double minLng, double maxLng) {
+        LatLng minLatLng = new LatLng(minLat, minLng);
+        LatLng maxLatLng = new LatLng(maxLat, maxLng);
+        double distance = DistanceUtil.getDistance(minLatLng, maxLatLng);
+
+        if (distance <= 100.0d) {
+            return 12;
+        }
+
+        for (int i = 0; i < BAIDU_MAP_ZOOM.length; i++) {
+            if (BAIDU_MAP_ZOOM[i] - distance > 0) {
+                moveDistance = (BAIDU_MAP_ZOOM[i] - distance) / DISTANCE_RATIO;
+                Log.d(TAG, "getZoom() moveDistance = " + moveDistance);
+                return 18 - i;
+            }
+        }
+        return 12;
     }
 
     /**

@@ -18,6 +18,7 @@ import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -288,6 +289,10 @@ public class RetrofitManager2 {
                         && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
                     DeviceLocation deviceLocation = deviceLocationInfos.getDetails().get(0); //最新位置点
 
+                    //GPS坐标转百度地图坐标
+                    CoordinateConverter converter = new CoordinateConverter();
+                    converter.from(CoordinateConverter.CoordType.GPS);
+
                     String reportTime = deviceLocation.getReportTime();
                     String uploadType = deviceLocation.getUploadType();
                     String securityLevel = deviceLocation.getSecurityLevel();
@@ -297,6 +302,8 @@ public class RetrofitManager2 {
                             Double.parseDouble(location[0]),
                             Double.parseDouble(location[1])
                     );
+                    converter.coord(latLng);
+                    latLng = converter.convert();
 
                     LocationDetail d = new LocationDetail(reportTime,
                             uploadType,
@@ -327,6 +334,11 @@ public class RetrofitManager2 {
                 List<LocationDetail> list = new ArrayList<>();
                 if (deviceLocationInfos != null
                         && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
+
+                    //GPS坐标转百度地图坐标
+                    CoordinateConverter converter = new CoordinateConverter();
+                    converter.from(CoordinateConverter.CoordType.GPS);
+
                     for (DeviceLocation deviceLocation :
                             deviceLocationInfos.getDetails()) {
                         String reportTime = deviceLocation.getReportTime();
@@ -338,6 +350,8 @@ public class RetrofitManager2 {
                                 Double.parseDouble(location[0]),
                                 Double.parseDouble(location[1])
                         );
+                        converter.coord(latLng);
+                        latLng = converter.convert();
 
                         LocationDetail d = new LocationDetail(reportTime,
                                 uploadType,
