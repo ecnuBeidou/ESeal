@@ -137,6 +137,7 @@ public class FreightTrackGoogleMapFragment extends Fragment {
         setupBaiduMap();
         setupGoogleMap();
         googleMapView.onCreate(savedInstanceState);
+        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -145,8 +146,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
         super.onResume();
         bmapView.onResume();
         googleMapView.onResume();
-
-        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
     }
 
     @Override

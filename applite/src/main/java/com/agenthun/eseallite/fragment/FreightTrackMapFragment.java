@@ -126,6 +126,7 @@ public class FreightTrackMapFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setupBaiduMap();
+        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -133,8 +134,6 @@ public class FreightTrackMapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         bmapView.onResume();
-
-        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
     }
 
     @Override

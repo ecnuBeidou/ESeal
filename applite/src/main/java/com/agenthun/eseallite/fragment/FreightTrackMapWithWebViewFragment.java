@@ -144,6 +144,7 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setupBaiduMap();
+        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -151,7 +152,6 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
     public void onResume() {
         super.onResume();
         bmapView.onResume();
-        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
     }
 
     @Override
@@ -396,7 +396,9 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
             public void run() {
                 String data = buildHtmlMap(polylines);
 //                String data = buildHtmlSample();
-                webView.loadData(data, "text/html", "UTF-8");
+
+                //loadData不支持#、%、\、? 四种字符，用loadDataWithBaseURL
+                webView.loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
             }
         });
     }
@@ -455,7 +457,11 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
         html.append("zoom: " + zoom + ",");
         html.append("center: {lat: " + centerLat + ", lng: " + centerLng + "}");
         html.append("});");
-        html.append("drop();");
+
+        if (polylines.size() == 1) {
+            html.append("drop();");
+        }
+
         html.append("var flightPath = new google.maps.Polyline({");
         html.append("path: neighborhoods,");
         html.append("geodesic: true,");
@@ -475,8 +481,8 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
         html.append("window.setTimeout(function() {");
         html.append("markers.push(new google.maps.Marker({");
         html.append("position: position,");
-        html.append("map: map,");
-        html.append("animation: google.maps.Animation.DROP");
+        html.append("map: map");
+//        html.append("animation: google.maps.Animation.DROP");
         html.append("}));");
         html.append("}, timeout);");
         html.append("}");
@@ -554,8 +560,11 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
         LatLng maxLatLng = new LatLng(maxLat, maxLng);
         double distance = DistanceUtil.getDistance(minLatLng, maxLatLng);
 
-        if (distance <= 100.0d) {
+        if (distance == 0.0d) {
             return 12;
+        }
+        if (distance > 0.0d && distance <= 100.0d) {
+            return 18;
         }
 
         for (int i = 0; i < BAIDU_MAP_ZOOM.length; i++) {
