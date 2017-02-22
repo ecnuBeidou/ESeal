@@ -76,6 +76,7 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
                 signOut(true);
                 return true;
             case R.id.action_about:
+                AboutActivity.start(this);
                 break;
         }
 

@@ -12,6 +12,7 @@ import com.agenthun.eseallite.bean.base.BleAndBeidouNfcDevice;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
 import com.agenthun.eseallite.bean.base.Result;
+import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
 import com.agenthun.eseallite.connectivity.service.Api;
 import com.agenthun.eseallite.connectivity.service.FreightTrackWebService;
 import com.agenthun.eseallite.connectivity.service.PathType;
@@ -19,15 +20,21 @@ import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
+import com.pekingopera.versionupdate.bean.Update;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -64,11 +71,14 @@ public class RetrofitManager2 {
     public RetrofitManager2(PathType pathType) {
 //        initOkHttpClient();
         if (freightTrackWebService == null) {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getPath(pathType))
 //                .client(mOkHttpClient)
                     .addConverterFactory(XMLGsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .callbackExecutor(executorService)
                     .build();
             freightTrackWebService = retrofit.create(FreightTrackWebService.class);
         }
@@ -93,6 +103,10 @@ public class RetrofitManager2 {
                 return Api.WEB_SERVICE_V2_RELEASE;
             case MAP_SERVICE_V2_TEST:
                 return Api.MAP_SERVICE_V2_URL_STRING;
+            case ESeal_UPDATE_SERVICE_URL:
+                return Api.ESeal_UPDATE_SERVICE_URL;
+            case ESeal_LITE_UPDATE_SERVICE_URL:
+                return Api.ESeal_LITE_UPDATE_SERVICE_URL;
         }
         return "";
     }
@@ -375,5 +389,50 @@ public class RetrofitManager2 {
         return Observable
                 .just(list)
                 .delay(3000, TimeUnit.MILLISECONDS);*/
+    }
+
+    //APP 版本检测更新
+    public Observable<UpdateResponse.Entity> checkAppUpdateObservable() {
+        Observable<UpdateResponse> response = freightTrackWebService.checkAppUpdate();
+        return response.map(new Func1<UpdateResponse, UpdateResponse.Entity>() {
+            @Override
+            public UpdateResponse.Entity call(UpdateResponse updateResponse) {
+                if (updateResponse == null) {
+                    return null;
+                }
+                if (updateResponse.getError() == null || updateResponse.getError().getResult() != 1) {
+                    return null;
+                }
+                if (updateResponse.getEntity() != null) {
+                    return updateResponse.getEntity();
+                }
+                return null;
+            }
+        });
+    }
+
+    //APP Lite 版本检测更新
+    public Observable<UpdateResponse.Entity> checkAppLiteUpdateObservable() {
+        Observable<UpdateResponse> response = freightTrackWebService.checkAppLiteUpdate();
+        return response.map(new Func1<UpdateResponse, UpdateResponse.Entity>() {
+            @Override
+            public UpdateResponse.Entity call(UpdateResponse updateResponse) {
+                if (updateResponse == null) {
+                    return null;
+                }
+                if (updateResponse.getError() == null || updateResponse.getError().getResult() != 1) {
+                    return null;
+                }
+                if (updateResponse.getEntity() != null) {
+                    return updateResponse.getEntity();
+                }
+                return null;
+            }
+        });
+    }
+
+    //下载文件
+    public Observable<ResponseBody> downloadFileObservable(@Url String fileUrl) {
+        return freightTrackWebService.downloadFile(fileUrl);
     }
 }
