@@ -1,6 +1,8 @@
 package com.agenthun.eseallite.fragment;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -23,9 +25,12 @@ import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.VersionHelper;
 import com.pekingopera.versionupdate.util.FileUtils;
 
+import java.io.File;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import is.arontibo.library.ElasticDownloadView;
 import okhttp3.ResponseBody;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -47,6 +52,9 @@ public class AboutFragment extends Fragment {
     AppCompatTextView appNewVersionHint;
     @Bind(R.id.app_new_version_name)
     AppCompatTextView appNewVersionName;
+
+/*    @Bind(R.id.elastic_download_view)
+    ElasticDownloadView downloadView;*/
 
     public static AboutFragment newInstance() {
 
@@ -120,6 +128,14 @@ public class AboutFragment extends Fragment {
         snackbar.show();
     }
 
+    private void showMessage(String message, String textActionButton, @Nullable View.OnClickListener onClickListener) {
+        Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG)
+                .setAction(textActionButton, onClickListener);
+        ((TextView) (snackbar.getView().findViewById(R.id.snackbar_text)))
+                .setTextColor(ContextCompat.getColor(getContext(), R.color.blue_grey_100));
+        snackbar.show();
+    }
+
     private void showDialog(String title,
                             @Nullable String message,
                             @Nullable String textPositiveButton,
@@ -180,6 +196,19 @@ public class AboutFragment extends Fragment {
         }
     }
 
+    private void processInstallApk(String path) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(path)),
+                "application/vnd.android.package-archive");
+        startActivity(intent);
+    }
+
+    private void processUninstallApk(String packageName) {
+        Uri uri = Uri.parse("package:" + packageName);
+        Intent intent = new Intent(Intent.ACTION_DELETE, uri);
+        startActivity(intent);
+    }
+
     private void checkUpdateVersion(final boolean auto) {
         RetrofitManager2.builder(PathType.ESeal_LITE_UPDATE_SERVICE_URL).checkAppLiteUpdateObservable()
                 .subscribeOn(Schedulers.io())
@@ -215,12 +244,14 @@ public class AboutFragment extends Fragment {
                 .subscribe(new DownloadSubscriber<ResponseBody>(getContext(), fileName, new DownloadCallBack() {
                     @Override
                     public void onStart() {
-                        showMessage("开始下载");
+                        showMessage(getString(R.string.text_download_file));
+//                        downloadView.startIntro();
                     }
 
                     @Override
                     public void onProgress(long current, long total) {
                         Log.d(TAG, "downloaded: " + current + "/" + total);
+//                        downloadView.setProgress(current / total);
                     }
 
                     @Override
@@ -229,13 +260,23 @@ public class AboutFragment extends Fragment {
                     }
 
                     @Override
-                    public void onSuccess(String path, String name, long fileSize) {
-                        showMessage("下载成功, path: " + path + ", size" + fileSize);
+                    public void onSuccess(final String path, final String name, long fileSize) {
+                        showMessage(getString(R.string.success_download_file),
+                                getString(R.string.text_app_install_now),
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        processInstallApk(path);
+                                    }
+                                });
+//                        showMessage("下载成功, path: " + path + ", size" + fileSize);
+//                        downloadView.success();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         showDownloadFileError();
+//                        downloadView.fail();
                     }
                 }));
 

@@ -135,7 +135,9 @@
     <string name="text_update_latest_version">"最新版本: "</string>
     <string name="text_update_version_size">"新版本大小: "</string>
     <string name="text_update_version_content">"更新内容: "</string>
-    <string name="error_download_file">下载文件失败</string>
+    <string name="text_download_file">开始下载APK</string>
+    <string name="error_download_file">下载APK失败</string>
+    <string name="success_download_file">下载APK成功</string>
 
     <string name="text_app_introduction">功能介绍</string>
     <string name="text_thanks">致谢</string>
