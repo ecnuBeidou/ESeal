@@ -1,6 +1,7 @@
 package com.agenthun.eseallite.utils;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
@@ -47,5 +48,34 @@ public class VersionHelper {
             e.printStackTrace();
         }
         return versionName;
+    }
+
+    /**
+     * 获取包名称
+     *
+     * @param context
+     * @return
+     */
+    public static String getPackageName(Context context) {
+        return context.getPackageName();
+    }
+
+    /**
+     * 获取程序名称
+     *
+     * @param context
+     * @return
+     */
+    public static String getAppName(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        ApplicationInfo applicationInfo;
+        String appName = "";
+        try {
+            applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);
+            appName = applicationInfo.loadLabel(packageManager).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return appName;
     }
 }

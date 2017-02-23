@@ -5,6 +5,7 @@ import android.content.Context;
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.bean.update.ResponseResult;
 import com.agenthun.eseallite.bean.update.Version;
+import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.pekingopera.versionupdate.ParseData;
@@ -23,7 +24,7 @@ public class UpdateConfig {
     /**
      * Update check via Http Get
      */
-    public static void initGet(Context context) {
+    public static void initGet(final Context context) {
         UpdateHelper.init(context);
 
         String url = "http://www.freight-track.com/update/updatecheck3.aspx";
@@ -58,6 +59,8 @@ public class UpdateConfig {
                         update.setUpdateContent(version.getUpdateContent());
                         update.setForce(version.isForce());
 
+                        PreferencesHelper.writeAppNewVersionToPreferences(context, version.getVersionName());
+                        
                         return update;
                     }
                 });

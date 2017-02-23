@@ -7,9 +7,16 @@ import com.agenthun.eseal.bean.BleAndBeidouNfcDeviceInfos;
 import com.agenthun.eseal.bean.DeviceLocationInfos;
 import com.agenthun.eseal.bean.User;
 import com.agenthun.eseal.bean.base.Result;
+import com.agenthun.eseal.bean.updateByRetrofit.UpdateResponse;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.Query;
+import retrofit2.http.Streaming;
+import retrofit2.http.Url;
 import rx.Observable;
 
 /**
@@ -158,4 +165,29 @@ public interface FreightTrackWebService {
             @Query("token") String token,
             @Query("implementID") String implementID,
             @Query("language") String language);
+
+    //APP 版本检测更新
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json"
+    })
+    @GET(Api.ESeal_UPDATE_SERVICE_URL)
+    Observable<UpdateResponse> checkAppUpdate();
+
+    //APP Lite 版本检测更新
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json"
+    })
+    @GET(Api.ESeal_LITE_UPDATE_SERVICE_URL)
+    Observable<UpdateResponse> checkAppLiteUpdate();
+
+    //下载APK文件
+    @Streaming
+    @GET
+    Observable<ResponseBody> downloadFile(@Url String fileUrl);
+
+    @Streaming
+    @GET
+    Observable<Response<ResponseBody>> downloadFile(@Header("Range") String range, @Url String fileUrl);
 }

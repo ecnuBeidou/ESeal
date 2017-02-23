@@ -64,7 +64,7 @@ public class PreferencesHelper {
 
     public static String getAppNewVersion(Context context) {
         SharedPreferences preferences = getSharedPreferences(context);
-        final String newVersion = preferences.getString(PREFERENCE_APP_NEW_VERSION, "");
+        final String newVersion = preferences.getString(PREFERENCE_APP_NEW_VERSION, "null");
         return newVersion;
     }
 
