@@ -100,6 +100,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.Fullscreen"></activity>
 
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.TextAppearance" />
+
         <!--百度地图API-->
         <service
             android:name="com.baidu.location.f"

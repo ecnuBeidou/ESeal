@@ -107,6 +107,7 @@
     <string name="text_search">Search</string>
     <string name="text_location_search">Location</string>
     <string name="error_query_freight_location">Locate Freight Failed, Please Try Again</string>
+    <string name="warn_query_freight_location_no_data">Query No Location Data</string>
 
     <string name="title_pick_time">Pick Time</string>
     <string name="text_hint_time_from">From</string>

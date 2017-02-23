@@ -11,23 +11,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.agenthun.eseal.App;
 import com.agenthun.eseal.R;
-import com.agenthun.eseal.bean.BeidouMasterDeviceInfos;
-import com.agenthun.eseal.bean.BleAndBeidouNfcDeviceInfos;
 import com.agenthun.eseal.bean.DeviceLocationInfos;
-import com.agenthun.eseal.bean.base.BeidouMasterDevice;
-import com.agenthun.eseal.bean.base.BleAndBeidouNfcDevice;
 import com.agenthun.eseal.bean.base.DeviceLocation;
 import com.agenthun.eseal.bean.base.LocationDetail;
 import com.agenthun.eseal.connectivity.manager.RetrofitManager;
-import com.agenthun.eseal.connectivity.service.Api;
 import com.agenthun.eseal.connectivity.service.PathType;
 import com.agenthun.eseal.utils.DeviceSearchSuggestion;
+import com.agenthun.eseal.utils.LanguageUtil;
+import com.agenthun.eseal.utils.PreferencesHelper;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
@@ -48,7 +46,6 @@ import com.umeng.analytics.MobclickAgent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,12 +55,8 @@ import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observer;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * @project ESeal
@@ -104,6 +97,8 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
     private FloatingSearchView floatingSearchView;
 
+    private boolean mUsingWebView = false;
+
     public static FreightTrackBaiduMapFragment newInstance() {
         FreightTrackBaiduMapFragment fragment = new FreightTrackBaiduMapFragment();
         return fragment;
@@ -120,6 +115,14 @@ public class FreightTrackBaiduMapFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_freight_track_baidu_map, container, false);
         ButterKnife.bind(this, view);
 
+        //根据当前系统语言设置加载不同的Map Ui
+        mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
+//        mUsingWebView = true; //for test webviewMap
+        setupMapUi(mUsingWebView, false);
+        if (mUsingWebView) {
+            setupWebView();
+        }
+
         return view;
     }
 
@@ -127,103 +130,35 @@ public class FreightTrackBaiduMapFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String token = App.getToken();
+        String token = PreferencesHelper.getTOKEN(getContext());
         if (token != null) {
             suggestionList.clear();
-            /**
-             * 获取蓝牙锁访问链路
-             */
-//            RetrofitManager.builder(PathType.BASE_WEB_SERVICE).getBleDeviceFreightListObservable(token)
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getBleAndBeidouNfcDeviceFreightListObservable(token)
-                    .subscribe(new Action1<BleAndBeidouNfcDeviceInfos>() {
+            //获取所有设备货物信息
+            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+                    .getAllDeviceFreightListObservable(token)
+                    .subscribe(new Subscriber<List<DeviceSearchSuggestion>>() {
                         @Override
-                        public void call(BleAndBeidouNfcDeviceInfos deviceInfos) {
-                            if (deviceInfos == null) return;
-                            if (deviceInfos.getResult().get(0).getRESULT() != 1) return;
-                            List<BleAndBeidouNfcDevice> details = deviceInfos.getDetails();
-                            for (BleAndBeidouNfcDevice detail :
-                                    details) {
-                                Log.d(TAG, "getBleDevice(): " + detail.toString());
-                                if (detail.getDeviceType().equals(Api.DEVICE_TYPE_BLE)) {
-                                    DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail,
-                                            DeviceSearchSuggestion.DEVICE_BLE);
-                                    suggestionList.add(suggestion);
-                                } else if (detail.getDeviceType().equals(Api.DEVICE_TYPE_BEIDOU_NFC)) {
-                                    DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail,
-                                            DeviceSearchSuggestion.DEVICE_BEIDOU_NFC);
-                                    suggestionList.add(suggestion);
-                                }
-                            }
-                            Log.d(TAG, "from ble suggestionList.size(): " + suggestionList.size());
+                        public void onCompleted() {
+
                         }
-                    }, new Action1<Throwable>() {
+
                         @Override
-                        public void call(Throwable throwable) {
-                            Log.d(TAG, "getBleAndBeidouNfcDevice() throwable: " + throwable.getLocalizedMessage());
+                        public void onError(Throwable e) {
+                            Log.d(TAG, "onError: getAllDeviceFreightListObservable()");
+                        }
+
+                        @Override
+                        public void onNext(List<DeviceSearchSuggestion> deviceSearchSuggestions) {
+                            if (deviceSearchSuggestions != null && !deviceSearchSuggestions.isEmpty()) {
+                                suggestionList.addAll(deviceSearchSuggestions);
+                            }
                         }
                     });
-
-/*            FreightTrackWebService service = RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getFreightTrackWebService();
-            Observable.zip(
-                    service.getBleDeviceFreightList(token, LanguageUtil.getLanguage()),
-                    service.getBeidouMasterDeviceFreightList(token, LanguageUtil.getLanguage()),
-                    service.getBeidouNfcDeviceFreightList(token, LanguageUtil.getLanguage()),
-            );*/
-            /**
-             * 北斗终端帽访问链路
-             */
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getBeidouMasterDeviceFreightListObservable(token)
-                    .subscribe(new Action1<BeidouMasterDeviceInfos>() {
-                        @Override
-                        public void call(BeidouMasterDeviceInfos beidouMasterDeviceInfos) {
-                            if (beidouMasterDeviceInfos == null) return;
-                            if (beidouMasterDeviceInfos.getResult().get(0).getRESULT() != 1) return;
-                            List<BeidouMasterDevice> details = beidouMasterDeviceInfos.getDetails();
-                            for (BeidouMasterDevice detail :
-                                    details) {
-                                Log.d(TAG, "getBeidouMasterDevice(): " + detail.toString());
-                                DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail);
-                                suggestionList.add(suggestion);
-                            }
-                            Log.d(TAG, "from beiMaster suggestionList.size(): " + suggestionList.size());
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.d(TAG, "getBeidouMasterDevice() throwable: " + throwable.getLocalizedMessage());
-                        }
-                    });
-
-            /**
-             * 北斗终端NFC访问链路
-             */
-/*            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getBeidouNfcDeviceFreightListObservable(token)
-                    .subscribe(new Action1<BeidouNfcDeviceInfos>() {
-                        @Override
-                        public void call(BeidouNfcDeviceInfos beidouNfcDeviceInfos) {
-                            if (beidouNfcDeviceInfos == null) return;
-                            if (beidouNfcDeviceInfos.getResult().get(0).getRESULT() != 1) return;
-                            List<BeidouNfcDevice> details = beidouNfcDeviceInfos.getDetails();
-                            for (BeidouNfcDevice detail :
-                                    details) {
-                                Log.d(TAG, "getBeidouNfcDevice(): " + detail.toString());
-                                DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail);
-                                suggestionList.add(suggestion);
-                            }
-                            Log.d(TAG, "from beiNfc suggestionList.size(): " + suggestionList.size());
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.d(TAG, "getBeidouNfcDevice() throwable: " + throwable.getLocalizedMessage());
-                        }
-                    });*/
         }
 
         setupBaiduMap();
 
         mHandler = new Handler();
-        loadingMapState(false);
 
         floatingSearchView = (FloatingSearchView) view.findViewById(R.id.floatingSearchview);
         setupFloatingSearch();
@@ -247,6 +182,44 @@ public class FreightTrackBaiduMapFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         bmapView.onDestroy();
+    }
+
+    private void setupMapUi(boolean usingWebView) {
+        if (usingWebView) {
+            bmapView.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+        } else {
+            bmapView.setVisibility(View.VISIBLE);
+            webView.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 更新地图显示状态
+     */
+    private void setupMapUi(boolean usingWebView, boolean enable) {
+        if (enable) {
+            if (usingWebView) {
+                bmapView.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+            } else {
+                bmapView.setVisibility(View.VISIBLE);
+                webView.setVisibility(View.GONE);
+            }
+            blurredMap.setVisibility(View.GONE);
+        } else {
+            bmapView.setVisibility(View.GONE);
+            webView.setVisibility(View.GONE);
+            blurredMap.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setupWebView() {
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setBuiltInZoomControls(true);
     }
 
     /**
@@ -309,8 +282,10 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                         ", type = " + type +
                         ", name = " + name);
 
-                loadingMapState(true);
-                clearLocationData();
+                setupMapUi(mUsingWebView, true);
+                if (!mUsingWebView) {
+                    clearLocationData();
+                }
                 getLocationData(id, type, name);
                 umengOnEvent(id, type, name); //友盟API
             }
@@ -320,19 +295,6 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                 Log.d(TAG, "onSearchAction");
             }
         });
-    }
-
-    /**
-     * 更新地图显示状态
-     */
-    private void loadingMapState(boolean isLoading) {
-        if (isLoading) {
-            blurredMap.setVisibility(View.GONE);
-            bmapView.setVisibility(View.VISIBLE);
-        } else {
-            blurredMap.setVisibility(View.VISIBLE);
-            bmapView.setVisibility(View.GONE);
-        }
     }
 
     /**
@@ -368,7 +330,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
      * 访问定位数据信息
      */
     private void getLocationData(final String id, final Integer type, final String name) {
-        String token = App.getToken();
+        String token = PreferencesHelper.getTOKEN(getContext());
 
         if (token != null) {
             new Thread(new Runnable() {
@@ -376,12 +338,11 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                 public void run() {
                     switch (type) {
                         case DeviceSearchSuggestion.DEVICE_BLE:
-                            String idTset = "1151";//"718";
                             /**
                              * 获取蓝牙锁定位数据信息
                              */
                             RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                                    .getBleDeviceLocationObservable(App.getToken(), id)
+                                    .getBleAndBeidouNfcDeviceLocationObservable(PreferencesHelper.getTOKEN(getContext()), id)
                                     .map(new Func1<DeviceLocationInfos, List<LocationDetail>>() {
                                         @Override
                                         public List<LocationDetail> call(DeviceLocationInfos locationInfos) {
@@ -401,14 +362,20 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
                                         @Override
                                         public void onError(Throwable e) {
-                                            Log.d(TAG, "getBleDeviceLocationObservable Error()");
-                                            clearLocationData();
-                                            loadingMapState(false);
+                                            Log.d(TAG, "onError: getBleAndBeidouNfcDeviceLocationObservable()");
+                                            if (!mUsingWebView) {
+                                                clearLocationData();
+                                            }
+                                            setupMapUi(mUsingWebView, false);
                                         }
 
                                         @Override
                                         public void onNext(List<LocationDetail> locationDetails) {
-                                            showBaiduMap(locationDetails);
+                                            if (!mUsingWebView) {
+                                                showBaiduMap(locationDetails);
+                                            } else {
+                                                showWebViewMap(locationDetails);
+                                            }
 
                                             if (mOnItemClickListener != null && locationDetails != null && locationDetails.size() != 0) {
                                                 mOnItemClickListener.onItemClick(name, id, locationDetails);
@@ -441,14 +408,20 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
                                         @Override
                                         public void onError(Throwable e) {
-                                            Log.d(TAG, "getBeidouMasterDeviceLocationObservable Error()");
-                                            clearLocationData();
-                                            loadingMapState(false);
+                                            Log.d(TAG, "onError: getBeidouMasterDeviceLocationObservable()");
+                                            if (!mUsingWebView) {
+                                                clearLocationData();
+                                            }
+                                            setupMapUi(mUsingWebView, false);
                                         }
 
                                         @Override
                                         public void onNext(List<LocationDetail> locationDetails) {
-                                            showBaiduMap(locationDetails);
+                                            if (!mUsingWebView) {
+                                                showBaiduMap(locationDetails);
+                                            } else {
+                                                showWebViewMap(locationDetails);
+                                            }
 
                                             if (mOnItemClickListener != null && locationDetails != null && locationDetails.size() != 0) {
                                                 mOnItemClickListener.onItemClick(name, id, locationDetails);
@@ -461,7 +434,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                              * 北斗终端NFC定位数据信息
                              */
                             RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                                    .getBleDeviceLocationObservable(App.getToken(), id)
+                                    .getBleAndBeidouNfcDeviceLocationObservable(App.getToken(), id)
                                     .map(new Func1<DeviceLocationInfos, List<LocationDetail>>() {
                                         @Override
                                         public List<LocationDetail> call(DeviceLocationInfos locationInfos) {
@@ -481,9 +454,11 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
                                         @Override
                                         public void onError(Throwable e) {
-                                            Log.d(TAG, "getBleDeviceLocationObservable Error()");
-                                            clearLocationData();
-                                            loadingMapState(false);
+                                            Log.d(TAG, "onError: getBleAndBeidouNfcDeviceLocationObservable()");
+                                            if (!mUsingWebView) {
+                                                clearLocationData();
+                                            }
+                                            setupMapUi(mUsingWebView, false);
                                         }
 
                                         @Override
@@ -492,44 +467,13 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                                                 mOnItemClickListener.onItemClick(name, id, locationDetails);
                                             }
 
-                                            showBaiduMap(locationDetails);
+                                            if (!mUsingWebView) {
+                                                showBaiduMap(locationDetails);
+                                            } else {
+                                                showWebViewMap(locationDetails);
+                                            }
                                         }
                                     });
-/*                            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                                    .getBeidouNfcDeviceLocationObservable(App.getToken(), id)
-                                    .map(new Func1<DeviceLocationInfos, List<LocationDetail>>() {
-                                        @Override
-                                        public List<LocationDetail> call(DeviceLocationInfos locationInfos) {
-                                            if (locationInfos == null ||
-                                                    locationInfos.getResult().get(0).getRESULT() != 1)
-                                                return new ArrayList<LocationDetail>();
-
-                                            List<LocationDetail> res = locationInfosToLocationDetailList(locationInfos.getDetails());
-                                            return res;
-                                        }
-                                    })
-                                    .subscribe(new Subscriber<List<LocationDetail>>() {
-                                        @Override
-                                        public void onCompleted() {
-
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable e) {
-                                            Log.d(TAG, "getBeidouNfcDeviceLocationObservable Error()");
-                                            clearLocationData();
-                                            loadingMapState(false);
-                                        }
-
-                                        @Override
-                                        public void onNext(List<LocationDetail> locationDetails) {
-                                            showBaiduMap(locationDetails);
-
-                                            if (mOnItemClickListener != null && locationDetails != null && locationDetails.size() != 0) {
-                                                mOnItemClickListener.onItemClick(name, id, locationDetails);
-                                            }
-                                        }
-                                    });*/
                             break;
                     }
                 }
@@ -931,8 +875,10 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
     private void showLoadingFreightLocationError() {
         showMessage(getString(R.string.error_query_freight_location));
-        clearLocationData();
-        loadingMapState(false);
+        if (!mUsingWebView) {
+            clearLocationData();
+        }
+        setupMapUi(mUsingWebView, false);
     }
 
     private void showMessage(String message) {

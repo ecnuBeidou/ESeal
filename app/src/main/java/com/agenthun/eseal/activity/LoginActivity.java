@@ -165,7 +165,6 @@ public class LoginActivity extends AppCompatActivity {
                                 PreferencesHelper.writeTokenToPreferences(LoginActivity.this, token);
                                 App.setToken(token);
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtra(RetrofitManager.TOKEN, token);
                                 startActivity(intent);
                                 finish();
                             } else {

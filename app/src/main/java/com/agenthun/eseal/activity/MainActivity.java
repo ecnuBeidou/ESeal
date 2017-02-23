@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        token = getIntent().getStringExtra(RetrofitManager.TOKEN);
+        token = PreferencesHelper.getTOKEN(this);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
@@ -208,7 +208,8 @@ public class MainActivity extends AppCompatActivity {
                 signOut(true);
                 return true;
             case R.id.action_about:
-                break;
+                AboutActivity.start(this);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

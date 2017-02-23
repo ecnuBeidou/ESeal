@@ -385,9 +385,13 @@ public class RetrofitManager2 {
                 if (deviceLocationInfos != null
                         && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
 
+                    //查询无数据返回
+                    if (deviceLocationInfos.getResult().get(0).getICOUNT() == 0) {
+                        return list;
+                    }
                     //GPS坐标转百度地图坐标
-                    CoordinateConverter converter = new CoordinateConverter();
-                    converter.from(CoordinateConverter.CoordType.GPS);
+//                    CoordinateConverter converter = new CoordinateConverter();
+//                    converter.from(CoordinateConverter.CoordType.GPS);
 
                     for (DeviceLocation deviceLocation :
                             deviceLocationInfos.getDetails()) {
@@ -400,8 +404,8 @@ public class RetrofitManager2 {
                                 Double.parseDouble(location[0]),
                                 Double.parseDouble(location[1])
                         );
-                        converter.coord(latLng);
-                        latLng = converter.convert();
+//                        converter.coord(latLng);
+//                        latLng = converter.convert();
 
                         LocationDetail d = new LocationDetail(reportTime,
                                 uploadType,

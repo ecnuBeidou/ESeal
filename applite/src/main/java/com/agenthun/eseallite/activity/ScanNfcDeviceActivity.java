@@ -77,7 +77,7 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
                 return true;
             case R.id.action_about:
                 AboutActivity.start(this);
-                break;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

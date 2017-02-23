@@ -107,6 +107,7 @@
     <string name="text_search">搜索</string>
     <string name="text_location_search">定位</string>
     <string name="error_query_freight_location">获取位置信息失败, 请重试</string>
+    <string name="warn_query_freight_location_no_data">查无数据</string>
 
     <string name="title_pick_time">选择时间段</string>
     <string name="text_hint_time_from">开始日期</string>
