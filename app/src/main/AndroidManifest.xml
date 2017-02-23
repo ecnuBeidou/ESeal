@@ -116,8 +116,13 @@
             </intent-filter>
         </service>
 
+        //for agenthun 百度地图API KEY
         <!--<meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="ZsAwCHLDTrMGyu4Nb7HLfeAOjawrAQF6" />-->
-        <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="PImgr2N0Ot0ezTZQ6GycGbPp2bPvbW9r" />
+
+        //for meng 百度地图API KEY
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="PImgr2N0Ot0ezTZQ6GycGbPp2bPvbW9r" />
 
         <!--友盟U-App API-->
         <meta-data
