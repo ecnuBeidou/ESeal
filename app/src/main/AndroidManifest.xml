@@ -115,9 +115,9 @@
                 <action android:name="com.baidu.location.service_v2.2"></action>
             </intent-filter>
         </service>
-        <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="ZsAwCHLDTrMGyu4Nb7HLfeAOjawrAQF6" />
+
+        <!--<meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="ZsAwCHLDTrMGyu4Nb7HLfeAOjawrAQF6" />-->
+        <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="PImgr2N0Ot0ezTZQ6GycGbPp2bPvbW9r" />
 
         <!--友盟U-App API-->
         <meta-data
