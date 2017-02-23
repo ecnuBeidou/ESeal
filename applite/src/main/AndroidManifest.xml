@@ -63,9 +63,9 @@
                 <action android:name="com.baidu.location.service_v2.2"></action>
             </intent-filter>
         </service>
-        <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="wHHhofqGwWGGEGOUbLhZFKcY" />
+
+        <!--<meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="wHHhofqGwWGGEGOUbLhZFKcY" />-->
+        <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="CPWln3SclTqUed1GwPNA6i1b1OWpz7At" />
 
         <!--Google地图API-->
         <meta-data
