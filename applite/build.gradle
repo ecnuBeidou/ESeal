@@ -78,6 +78,7 @@ dependencies {
     compile 'com.android.support:design:25.0.1'
     compile 'com.android.support:recyclerview-v7:25.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.2'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
@@ -89,5 +90,6 @@ dependencies {
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.jzxiang.pickerview:TimePickerDialog:1.0.1'
     compile 'com.google.android.gms:play-services-maps:10.0.1'
+    compile 'com.github.tibolte:elasticdownload:1.0.+'
     compile project(':versionupdate')
 }

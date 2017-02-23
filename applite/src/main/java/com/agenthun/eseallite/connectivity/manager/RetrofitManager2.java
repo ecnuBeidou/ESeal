@@ -1,5 +1,6 @@
 package com.agenthun.eseallite.connectivity.manager;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -8,11 +9,12 @@ import com.agenthun.eseallite.bean.BleAndBeidouNfcDeviceInfos;
 import com.agenthun.eseallite.bean.DeviceLocationInfos;
 import com.agenthun.eseallite.bean.User;
 import com.agenthun.eseallite.bean.base.BeidouMasterDevice;
-import com.agenthun.eseallite.bean.base.BleAndBeidouNfcDevice;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
 import com.agenthun.eseallite.bean.base.Result;
 import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
+import com.agenthun.eseallite.connectivity.manager.cookie.CacheInterceptor;
+import com.agenthun.eseallite.connectivity.manager.cookie.CookieJarManager;
 import com.agenthun.eseallite.connectivity.service.Api;
 import com.agenthun.eseallite.connectivity.service.FreightTrackWebService;
 import com.agenthun.eseallite.connectivity.service.PathType;
@@ -20,20 +22,20 @@ import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
-import com.pekingopera.versionupdate.bean.Update;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Query;
 import retrofit2.http.Url;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -59,35 +61,69 @@ public class RetrofitManager2 {
     public static final String TOKEN = "TOKEN";
 
     private static FreightTrackWebService freightTrackWebService;
-    private static OkHttpClient mOkHttpClient;
-
+    private static OkHttpClient mOkHttpClient = null;
+    private Cache cache = null;
+    private File httpCacheDirectory;
+    private Context mContext;
 
     //创建实例
     public static RetrofitManager2 builder(PathType pathType) {
         return new RetrofitManager2(pathType);
     }
 
+    public static RetrofitManager2 builder(Context context, PathType pathType) {
+        return new RetrofitManager2(context, pathType);
+    }
+
     //配置Retrofit
     public RetrofitManager2(PathType pathType) {
-//        initOkHttpClient();
         if (freightTrackWebService == null) {
-            ExecutorService executorService = Executors.newFixedThreadPool(1);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getPath(pathType))
-//                .client(mOkHttpClient)
                     .addConverterFactory(XMLGsonConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                    .callbackExecutor(executorService)
                     .build();
             freightTrackWebService = retrofit.create(FreightTrackWebService.class);
         }
     }
 
+    public RetrofitManager2(Context context, PathType pathType) {
+        mContext = context;
+        initOkHttpClient();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getPath(pathType))
+                .client(mOkHttpClient)
+                .addConverterFactory(XMLGsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+        freightTrackWebService = retrofit.create(FreightTrackWebService.class);
+    }
+
     //配置OKHttpClient
     private void initOkHttpClient() {
-        if (mOkHttpClient == null) {
+        if (httpCacheDirectory == null) {
+            httpCacheDirectory = new File(mContext.getCacheDir(), "okhttp_cache");
         }
+
+        try {
+            if (cache == null) {
+                cache = new Cache(httpCacheDirectory, 10 * 1024 * 1024);
+            }
+        } catch (Exception e) {
+            Log.e("OKHttp", "Could not create http cache", e);
+        }
+        mOkHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .cookieJar(new CookieJarManager(mContext))
+                .cache(cache)
+                .addInterceptor(new CacheInterceptor(mContext))
+                .addNetworkInterceptor(new CacheInterceptor(mContext))
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .connectionPool(new ConnectionPool(5, 10, TimeUnit.SECONDS))
+                .build();
     }
 
     //获取相应的web路径
@@ -304,8 +340,8 @@ public class RetrofitManager2 {
                     DeviceLocation deviceLocation = deviceLocationInfos.getDetails().get(0); //最新位置点
 
                     //GPS坐标转百度地图坐标
-                    CoordinateConverter converter = new CoordinateConverter();
-                    converter.from(CoordinateConverter.CoordType.GPS);
+//                    CoordinateConverter converter = new CoordinateConverter();
+//                    converter.from(CoordinateConverter.CoordType.GPS);
 
                     String reportTime = deviceLocation.getReportTime();
                     String uploadType = deviceLocation.getUploadType();
@@ -316,8 +352,8 @@ public class RetrofitManager2 {
                             Double.parseDouble(location[0]),
                             Double.parseDouble(location[1])
                     );
-                    converter.coord(latLng);
-                    latLng = converter.convert();
+//                    converter.coord(latLng);
+//                    latLng = converter.convert();
 
                     LocationDetail d = new LocationDetail(reportTime,
                             uploadType,
@@ -434,5 +470,22 @@ public class RetrofitManager2 {
     //下载文件
     public Observable<ResponseBody> downloadFileObservable(@Url String fileUrl) {
         return freightTrackWebService.downloadFile(fileUrl);
+    }
+
+    public void downloadFileObservable(@Url String fileUrl, String fileName, DownloadCallBack callBack) {
+        freightTrackWebService.downloadFile(fileUrl)
+                .compose(schedulersTransformer())
+                .subscribe(new DownloadSubscriber<ResponseBody>(mContext, fileName, callBack));
+    }
+
+    Observable.Transformer schedulersTransformer() {
+        return new Observable.Transformer() {
+            @Override
+            public Object call(Object o) {
+                return ((Observable) o).subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
     }
 }
