@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.connectivity.manager.cookie;
+package com.agenthun.eseal.connectivity.manager.cookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;

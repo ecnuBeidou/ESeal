@@ -167,7 +167,7 @@ public class AboutFragment extends Fragment {
         }
 
         if (!auto) {
-            entity.setVersionCode(4); //for my test download
+//            entity.setVersionCode(4); //for my test download
 
             if (entity.getVersionCode() > Integer.parseInt(VersionHelper.getVersionCode(getContext()))) {
                 String message = getString(R.string.text_update_latest_version) + entity.getVersionName() + "\n" +
