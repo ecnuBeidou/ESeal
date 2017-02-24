@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.activity.FreightTrackMapActivity;
 import com.agenthun.eseallite.adapter.NfcDeviceAdapter;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager2;
+import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.PreferencesHelper;
@@ -28,8 +28,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @project ESeal
@@ -141,10 +139,7 @@ public class ScanNfcDeviceFragment extends Fragment {
             setLoadingIndicator(true);
         }
 
-        RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST).getAllDeviceFreightListObservable(token)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
+        RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getBeidouMasterDeviceFreightListWithFormatObservable(token)
                 .subscribe(new Observer<List<DeviceSearchSuggestion>>() {
                     @Override
                     public void onCompleted() {

@@ -15,11 +15,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
@@ -27,7 +24,7 @@ import com.agenthun.eseallite.activity.LoginActivity;
 import com.agenthun.eseallite.activity.TimePickerActivity;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager2;
+import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.agenthun.eseallite.utils.PreferencesHelper;
@@ -57,8 +54,6 @@ import java.util.TimeZone;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @project ESeal
@@ -691,10 +686,8 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
                                      @Nullable String from, @Nullable String to) {
         if (isFreightTrackMode) {
             //获取时间段内位置列表
-            RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST).getFreightLocationListObservable(token, id, from, to)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
+            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+                    .getBeidouMasterDeviceLocationObservable(token, id, from, to)
                     .subscribe(new Observer<List<LocationDetail>>() {
                         @Override
                         public void onCompleted() {
@@ -723,10 +716,8 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
                     });
         } else {
             //获取最新位置点
-            RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST).getFreightLocationObservable(token, id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
+            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+                    .getBeidouMasterDeviceLastLocationObservable(token, id)
                     .subscribe(new Observer<LocationDetail>() {
                         @Override
                         public void onCompleted() {

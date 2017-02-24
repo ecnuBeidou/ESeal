@@ -22,7 +22,7 @@ import com.agenthun.eseallite.activity.LoginActivity;
 import com.agenthun.eseallite.activity.TimePickerActivity;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager2;
+import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.agenthun.eseallite.view.BottomSheetDialogView;
@@ -51,8 +51,6 @@ import java.util.TimeZone;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @project ESeal
@@ -486,6 +484,10 @@ public class FreightTrackMapFragment extends Fragment {
         showMessage(getString(R.string.error_query_freight_location));
     }
 
+    private void showNoFreightLocationData() {
+        showMessage(getString(R.string.warn_query_freight_location_no_data));
+    }
+
     private void showMessage(String message) {
         Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null);
@@ -499,10 +501,8 @@ public class FreightTrackMapFragment extends Fragment {
                                      @Nullable String from, @Nullable String to) {
         if (isFreightTrackMode) {
             //获取时间段内位置列表
-            RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST).getFreightLocationListObservable(token, id, from, to)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
+            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+                    .getBeidouMasterDeviceLocationObservable(token, id, from, to)
                     .subscribe(new Observer<List<LocationDetail>>() {
                         @Override
                         public void onCompleted() {
@@ -516,17 +516,20 @@ public class FreightTrackMapFragment extends Fragment {
 
                         @Override
                         public void onNext(List<LocationDetail> locationDetails) {
-                            clearLocationData();
                             mLocationDetailList = locationDetails;
+
+                            if (locationDetails.isEmpty()) {
+                                showNoFreightLocationData();
+                                return;
+                            }
+                            clearLocationData();
                             showBaiduMap(locationDetails);
                         }
                     });
         } else {
             //获取最新位置点
-            RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST).getFreightLocationObservable(token, id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
+            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+                    .getBeidouMasterDeviceLastLocationObservable(token, id)
                     .subscribe(new Observer<LocationDetail>() {
                         @Override
                         public void onCompleted() {
@@ -540,8 +543,8 @@ public class FreightTrackMapFragment extends Fragment {
 
                         @Override
                         public void onNext(LocationDetail locationDetail) {
-                            clearLocationData();
                             mLocationDetail = locationDetail;
+                            clearLocationData();
                             showBaiduMap(locationDetail);
                         }
                     });

@@ -72,7 +72,7 @@ public class FreightTrackMapActivity extends AppCompatActivity {
 
 //        attachDeviceFragment();
 //        attachDeviceGoogleMapFragment(); //test GoogleMap
-        attachDeviceWithWebViewFragment(); //test WebView
+        attachDeviceWithWebViewFragment(); //using WebView & BaiduMap
 
         supportPostponeEnterTransition();
     }

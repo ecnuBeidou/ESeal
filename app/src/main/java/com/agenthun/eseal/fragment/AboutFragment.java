@@ -164,13 +164,14 @@ public class AboutFragment extends Fragment {
         }
 
         if (!auto) {
-//            entity.setVersionCode(4); //for my test download
+//            entity.setVersionCode(100); //for my test download
 
             if (entity.getVersionCode() > Integer.parseInt(VersionHelper.getVersionCode(getContext()))) {
                 String message = getString(R.string.text_update_latest_version) + entity.getVersionName() + "\n" +
                         getString(R.string.text_update_version_size) +
                         FileUtils.HumanReadableFilesize(entity.getApkSize()) + "\n\n" +
-                        getString(R.string.text_update_version_content) + "\n" + entity.getUpdateContent();
+                        getString(R.string.text_update_version_content) + "\n" +
+                        entity.getUpdateContent().replace("\\r\\n", "\r\n");
 
                 showDialog(getString(R.string.text_found_new_app_version),
                         message,
@@ -187,7 +188,7 @@ public class AboutFragment extends Fragment {
                         getString(R.string.text_app_update_later),
                         null
                 );
-            } else if (entity.getVersionCode() == Integer.parseInt(VersionHelper.getVersionCode(getContext()))) {
+            } else {
                 showMessage(getString(R.string.text_app_already_the_latest_version));
             }
         }
@@ -273,31 +274,32 @@ public class AboutFragment extends Fragment {
                     }
                 }));
 
-        /*        RetrofitManager2.builder(getContext(), PathType.WEB_SERVICE_V2_TEST).downloadFileObservable(url, fileName, new DownloadCallBack() {
-            @Override
-            public void onStart() {
-                showMessage("开始下载");
-            }
+ /*       RetrofitManager.builder(getContext(), PathType.WEB_SERVICE_V2_TEST)
+                .downloadFileObservable(url, fileName, new DownloadCallBack() {
+                    @Override
+                    public void onStart() {
+                        showMessage("开始下载");
+                    }
 
-            @Override
-            public void onProgress(long current, long total) {
-                Log.d(TAG, "downloaded: " + current + "/" + total);
-            }
+                    @Override
+                    public void onProgress(long current, long total) {
+                        Log.d(TAG, "downloaded: " + current + "/" + total);
+                    }
 
-            @Override
-            public void onCompleted() {
+                    @Override
+                    public void onCompleted() {
 
-            }
+                    }
 
-            @Override
-            public void onSuccess(String path, String name, long fileSize) {
-                showMessage("path: " + path + ", size" + fileSize);
-            }
+                    @Override
+                    public void onSuccess(String path, String name, long fileSize) {
+                        showMessage("path: " + path + ", size" + fileSize);
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                showDownloadFileError();
-            }
-        });*/
+                    @Override
+                    public void onError(Throwable e) {
+                        showDownloadFileError();
+                    }
+                });*/
     }
 }
