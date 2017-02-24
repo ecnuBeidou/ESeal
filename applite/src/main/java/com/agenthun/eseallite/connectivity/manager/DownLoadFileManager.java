@@ -1,11 +1,13 @@
 package com.agenthun.eseallite.connectivity.manager;
 
 import android.content.Context;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +61,43 @@ public class DownLoadFileManager {
 //        Log.d(TAG, "file path: " + path);
 
         try {
-            File futureStudioIconFile = new File(path);
+//            File futureStudioIconFile = new File(path); //存储在/storage/emulated/0/Android/data/包名/files/
+            File futureStudioIconFile = new File(Environment.getExternalStorageDirectory(), name); //存储在根目录/storage/emulated/0/
 
             if (futureStudioIconFile.exists()) {
-                futureStudioIconFile.delete();
+                long bodySize = body.contentLength();
+                final long size;
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(futureStudioIconFile);
+                    size = fis.available();
+                } catch (IOException e) {
+                    if (callBack != null) {
+                        callBack.onError(e);
+                    }
+                    return false;
+                } finally {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                }
+
+                if (size == bodySize) {
+                    //大小相同,初略判断为同一文件,不下载,直接安装
+                    if (callBack != null) {
+                        handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callBack.onSuccess(path, name, size);
+                            }
+                        });
+                    }
+                    return true;
+                } else {
+                    //大小不同, 删除文件
+                    futureStudioIconFile.delete();
+                }
             }
 
             InputStream inputStream = null;

@@ -15,10 +15,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * caheInterceptor
+ * cacheInterceptor
  * Created by Tamic on 2016-08-09.
  */
 public class CacheInterceptor implements Interceptor {
+
+    private static final String TAG = "CacheInterceptor";
 
     private Context context;
 
@@ -34,7 +36,7 @@ public class CacheInterceptor implements Interceptor {
             // read from cache for 60 s
             int maxAge = 60;
             String cacheControl = request.cacheControl().toString();
-            Log.e("Tamic", "60s load cahe" + cacheControl);
+            Log.e(TAG, "60s load cache" + cacheControl);
             return response.newBuilder()
                     .removeHeader("Pragma")
                     .removeHeader("Cache-Control")
@@ -47,7 +49,7 @@ public class CacheInterceptor implements Interceptor {
                     Toast.makeText(context, "当前无网络! 为你智能加载缓存", Toast.LENGTH_SHORT).show();
                 }
             });
-            Log.e("Tamic", " no network load cahe");
+            Log.e(TAG, " no network load cahe");
             request = request.newBuilder()
                     .cacheControl(CacheControl.FORCE_CACHE)
                     .build();

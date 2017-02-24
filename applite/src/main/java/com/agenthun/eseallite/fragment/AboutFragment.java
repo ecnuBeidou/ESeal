@@ -1,5 +1,6 @@
 package com.agenthun.eseallite.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,15 +11,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
 import com.agenthun.eseallite.connectivity.manager.DownloadCallBack;
+import com.agenthun.eseallite.connectivity.manager.DownloadService;
 import com.agenthun.eseallite.connectivity.manager.DownloadSubscriber;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
@@ -41,6 +47,15 @@ import rx.Subscriber;
 
 public class AboutFragment extends Fragment {
     private static final String TAG = "AboutFragment";
+
+    private static final String MY_HOME_PAGE_URL = "https://github.com/agenthun";
+
+    Toolbar toolbar;
+
+    @Bind(R.id.about_content)
+    View aboutContent;
+    @Bind(R.id.webView)
+    WebView webView;
 
     @Bind(R.id.app_version_name)
     AppCompatTextView appVersionName;
@@ -71,6 +86,20 @@ public class AboutFragment extends Fragment {
         String versionName = VersionHelper.getVersionName(getContext());
         appVersionName.setText(versionName);
 
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webView.getVisibility() == View.VISIBLE) {
+                    webView.setVisibility(View.GONE);
+                    aboutContent.setVisibility(View.VISIBLE);
+                    toolbar.setTitle(R.string.about);
+                } else if (webView.getVisibility() == View.GONE) {
+                    getActivity().onBackPressed();
+                }
+            }
+        });
+
         checkUpdateVersion(true);
         return view;
     }
@@ -86,16 +115,48 @@ public class AboutFragment extends Fragment {
                 break;
             case R.id.app_introduction:
                 Log.d(TAG, "onClick() returned: app_introduction");
+                showIntroduction();
                 break;
             case R.id.app_thanks:
                 Log.d(TAG, "onClick() returned: app_thanks");
+                showThanks();
                 break;
             case R.id.app_about_me:
                 Log.d(TAG, "onClick() returned: app_about_me");
+                showAboutMe();
                 break;
             default:
                 break;
         }
+    }
+
+    private void setupWebView() {
+        aboutContent.setVisibility(View.GONE);
+        webView.setVisibility(View.VISIBLE);
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setBuiltInZoomControls(true);
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.loadUrl(MY_HOME_PAGE_URL);
+    }
+
+    private void showIntroduction() {
+        showDialog(getString(R.string.text_app_introduction), R.layout.dialog_introduction,
+                getString(R.string.text_ok), null);
+    }
+
+    private void showThanks() {
+        showDialog(getString(R.string.text_thanks), getString(R.string.text_thanks_name),
+                null, null, null, null);
+    }
+
+    private void showAboutMe() {
+        toolbar.setTitle(R.string.text_app_about_me);
+        setupWebView();
     }
 
     private void showNoNewVersion() {
@@ -152,6 +213,19 @@ public class AboutFragment extends Fragment {
         builder.show();
     }
 
+    private void showDialog(String title, int layoutResId,
+                            @Nullable String textPositiveButton,
+                            @Nullable DialogInterface.OnClickListener onPositiveButtonClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        builder.setTitle(title).setView(layoutResId);
+
+        if (textPositiveButton != null) {
+            builder.setPositiveButton(textPositiveButton, onPositiveButtonClickListener);
+        }
+        builder.show();
+    }
+
     private void processUpdateVersion(boolean auto, final UpdateResponse.Entity entity) {
         if (entity == null) {
             showCheckUpdateVersionError();
@@ -182,7 +256,8 @@ public class AboutFragment extends Fragment {
                                 String packageName = VersionHelper.getPackageName(getContext());
                                 String name = packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length())
                                         + "_v_" + entity.getVersionName().replaceAll("\\.", "_").trim();
-                                downloadLatestApp(entity.getUpdateUrl(), name);
+//                                downloadLatestApp(entity.getUpdateUrl(), name); //下载显示方式1
+                                DownloadService.start(getContext(), entity.getUpdateUrl(), name);//下载显示方式2
                             }
                         },
                         getString(R.string.text_app_update_later),
@@ -194,17 +269,18 @@ public class AboutFragment extends Fragment {
         }
     }
 
-    private void processInstallApk(String path) {
+    private void processInstallApk(Context context, String path) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setDataAndType(Uri.fromFile(new File(path)),
                 "application/vnd.android.package-archive");
-        startActivity(intent);
+        ContextCompat.startActivity(context, intent, null);
     }
 
-    private void processUninstallApk(String packageName) {
+    private void processUninstallApk(Context context, String packageName) {
         Uri uri = Uri.parse("package:" + packageName);
         Intent intent = new Intent(Intent.ACTION_DELETE, uri);
-        startActivity(intent);
+        ContextCompat.startActivity(context, intent, null);
     }
 
     private void checkUpdateVersion(final boolean auto) {
@@ -260,7 +336,7 @@ public class AboutFragment extends Fragment {
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        processInstallApk(path);
+                                        processInstallApk(getContext(), path);
                                     }
                                 });
 //                        showMessage("下载成功, path: " + path + ", size" + fileSize);
@@ -273,33 +349,5 @@ public class AboutFragment extends Fragment {
 //                        downloadView.fail();
                     }
                 }));
-
- /*       RetrofitManager.builder(getContext(), PathType.WEB_SERVICE_V2_TEST)
-                .downloadFileObservable(url, fileName, new DownloadCallBack() {
-                    @Override
-                    public void onStart() {
-                        showMessage("开始下载");
-                    }
-
-                    @Override
-                    public void onProgress(long current, long total) {
-                        Log.d(TAG, "downloaded: " + current + "/" + total);
-                    }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onSuccess(String path, String name, long fileSize) {
-                        showMessage("path: " + path + ", size" + fileSize);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showDownloadFileError();
-                    }
-                });*/
     }
 }

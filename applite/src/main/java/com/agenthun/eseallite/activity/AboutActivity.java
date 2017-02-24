@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.webkit.WebView;
 
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.fragment.AboutFragment;
@@ -15,6 +16,7 @@ import com.agenthun.eseallite.fragment.TimePickerFragment;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
@@ -42,12 +44,12 @@ public class AboutActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setTitle(R.string.about);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+/*        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
-        });
+        });*/
 
         attachDeviceFragment();
 
