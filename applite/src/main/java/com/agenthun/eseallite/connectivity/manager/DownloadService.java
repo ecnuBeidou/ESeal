@@ -47,6 +47,8 @@ public class DownloadService extends Service {
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notificationBuilder;
 
+    private boolean downloading = false;
+
     //默认DOWNLOAD_ACTION为DOWNLOAD_ACTION_START启动下载
     public static void start(Context context, String url, String fileName) {
         Intent starter = new Intent(context, DownloadService.class);
@@ -54,6 +56,12 @@ public class DownloadService extends Service {
         starter.putExtra(DOWNLOAD_FILE_NAME, fileName);
         starter.putExtra(DOWNLOAD_ACTION, DOWNLOAD_ACTION_START);
         context.startService(starter);
+    }
+
+    public static void stop(Context context) {
+        Intent stoper = new Intent(context, DownloadService.class);
+        stoper.putExtra(DOWNLOAD_ACTION, DOWNLOAD_ACTION_STOP);
+        context.stopService(stoper);
     }
 
     @Override
@@ -79,7 +87,7 @@ public class DownloadService extends Service {
                 case DOWNLOAD_ACTION_START:
                     String url = intent.getStringExtra(DOWNLOAD_URL);
                     String name = intent.getStringExtra(DOWNLOAD_FILE_NAME);
-                    if (url != null && name != null) {
+                    if (!downloading && url != null && name != null) {
                         downloadLatestApp(url, name); //启动下载
                     }
                     break;
@@ -173,23 +181,28 @@ public class DownloadService extends Service {
         PendingIntent installNowPendingIntent = PendingIntent.getActivity(mContext,
                 NOTIFICATION_STATE_INSTALL_NOW, installNowIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //添加按钮
-        notificationBuilder.addAction(R.drawable.ic_timelapse_black_24dp,
-                getString(R.string.text_app_update_later),
-                installLaterPendingIntent);
-        notificationBuilder.addAction(R.drawable.ic_done_black_24dp,
-                getString(R.string.text_app_install_now),
-                installNowPendingIntent);
+        boolean usingButton = false; //控制是否使用按钮
 
-        //不加按钮
-/*        notificationBuilder.setContentTitle(name);// 设置通知中心的标题
-        notificationBuilder.setContentText(getString(R.string.success_download_file) +
-                ", " + getString(R.string.text_app_install_now));// 设置通知中心中的内容
-        notificationBuilder.setContentIntent(installNowPendingIntent);*/
-
+        if (usingButton) {
+            //添加按钮
+            notificationBuilder.addAction(R.drawable.ic_timelapse_black_24dp,
+                    getString(R.string.text_app_update_later),
+                    installLaterPendingIntent);
+            notificationBuilder.addAction(R.drawable.ic_done_black_24dp,
+                    getString(R.string.text_app_install_now),
+                    installNowPendingIntent);
+        } else {
+            //不加按钮
+            notificationBuilder.setContentTitle(name);// 设置通知中心的标题
+            notificationBuilder.setContentText(getString(R.string.success_download_file) +
+                    ", " + getString(R.string.text_app_install_now));// 设置通知中心中的内容
+            notificationBuilder.setContentIntent(installNowPendingIntent);
+        }
         notificationBuilder.setAutoCancel(true); //点击后消失
 
         notificationManager.notify(NOTIFICATION_STATE_NORMAL, notificationBuilder.build());
+
+        stop(mContext);
     }
 
     private void showDownloadFileError() {
@@ -244,6 +257,7 @@ public class DownloadService extends Service {
                 .subscribe(new DownloadSubscriber<ResponseBody>(mContext, fileName, new DownloadCallBack() {
                     @Override
                     public void onStart() {
+                        downloading = true;
                         showMessage(getString(R.string.text_download_file));
 
                         Intent intent = new Intent();
@@ -283,11 +297,13 @@ public class DownloadService extends Service {
                                 });
 
                         showDownloadFileSuccess(path, name);
+                        downloading = false;
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         showDownloadFileError();
+                        downloading = false;
                     }
                 }));
     }

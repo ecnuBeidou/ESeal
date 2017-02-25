@@ -117,6 +117,15 @@ public class UpdateResponse {
         public Entity() {
         }
 
+        public Entity(int apkSize, boolean force, String updateContent, String updateUrl, int versionCode, String versionName) {
+            ApkSize = apkSize;
+            Force = force;
+            UpdateContent = updateContent;
+            UpdateUrl = updateUrl;
+            VersionCode = versionCode;
+            VersionName = versionName;
+        }
+
         protected Entity(Parcel in) {
             this.ApkSize = in.readInt();
             this.Force = in.readByte() != 0;

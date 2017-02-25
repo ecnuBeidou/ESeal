@@ -1,9 +1,6 @@
 package com.agenthun.eseallite.fragment;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -23,20 +20,15 @@ import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
-import com.agenthun.eseallite.connectivity.manager.DownloadCallBack;
 import com.agenthun.eseallite.connectivity.manager.DownloadService;
-import com.agenthun.eseallite.connectivity.manager.DownloadSubscriber;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
 import com.agenthun.eseallite.utils.VersionHelper;
 import com.pekingopera.versionupdate.util.FileUtils;
 
-import java.io.File;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.ResponseBody;
 import rx.Subscriber;
 
 /**
@@ -64,9 +56,6 @@ public class AboutFragment extends Fragment {
     AppCompatTextView appNewVersionHint;
     @Bind(R.id.app_new_version_name)
     AppCompatTextView appNewVersionName;
-
-/*    @Bind(R.id.elastic_download_view)
-    ElasticDownloadView downloadView;*/
 
     public static AboutFragment newInstance() {
 
@@ -100,6 +89,8 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        setupWebView();
+
         checkUpdateVersion(true);
         return view;
     }
@@ -131,17 +122,19 @@ public class AboutFragment extends Fragment {
     }
 
     private void setupWebView() {
-        aboutContent.setVisibility(View.GONE);
-        webView.setVisibility(View.VISIBLE);
-
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
         WebSettings webSettings = webView.getSettings();
         webSettings.setAllowFileAccess(true);
         webSettings.setBuiltInZoomControls(true);
         webView.setWebChromeClient(new WebChromeClient());
+    }
 
+    private void showWebView() {
         webView.loadUrl(MY_HOME_PAGE_URL);
+
+        aboutContent.setVisibility(View.GONE);
+        webView.setVisibility(View.VISIBLE);
     }
 
     private void showIntroduction() {
@@ -156,7 +149,7 @@ public class AboutFragment extends Fragment {
 
     private void showAboutMe() {
         toolbar.setTitle(R.string.text_app_about_me);
-        setupWebView();
+        showWebView();
     }
 
     private void showNoNewVersion() {
@@ -172,10 +165,6 @@ public class AboutFragment extends Fragment {
 
     private void showCheckUpdateVersionError() {
         showMessage(getString(R.string.error_check_update_version));
-    }
-
-    private void showDownloadFileError() {
-        showMessage(getString(R.string.error_download_file));
     }
 
     private void showMessage(String message) {
@@ -256,8 +245,8 @@ public class AboutFragment extends Fragment {
                                 String packageName = VersionHelper.getPackageName(getContext());
                                 String name = packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length())
                                         + "_v_" + entity.getVersionName().replaceAll("\\.", "_").trim();
-//                                downloadLatestApp(entity.getUpdateUrl(), name); //下载显示方式1
-                                DownloadService.start(getContext(), entity.getUpdateUrl(), name);//下载显示方式2
+
+                                DownloadService.start(getContext(), entity.getUpdateUrl(), name);//下载显示方式Notification进度条
                             }
                         },
                         getString(R.string.text_app_update_later),
@@ -267,20 +256,6 @@ public class AboutFragment extends Fragment {
                 showMessage(getString(R.string.text_app_already_the_latest_version));
             }
         }
-    }
-
-    private void processInstallApk(Context context, String path) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setDataAndType(Uri.fromFile(new File(path)),
-                "application/vnd.android.package-archive");
-        ContextCompat.startActivity(context, intent, null);
-    }
-
-    private void processUninstallApk(Context context, String packageName) {
-        Uri uri = Uri.parse("package:" + packageName);
-        Intent intent = new Intent(Intent.ACTION_DELETE, uri);
-        ContextCompat.startActivity(context, intent, null);
     }
 
     private void checkUpdateVersion(final boolean auto) {
@@ -306,48 +281,5 @@ public class AboutFragment extends Fragment {
                         processUpdateVersion(auto, entity);
                     }
                 });
-    }
-
-    private void downloadLatestApp(final String url, final String fileName) {
-        RetrofitManager.builder(getContext(), PathType.WEB_SERVICE_V2_TEST)
-                .downloadFileObservable(url)
-                .subscribe(new DownloadSubscriber<ResponseBody>(getContext(), fileName, new DownloadCallBack() {
-                    @Override
-                    public void onStart() {
-                        showMessage(getString(R.string.text_download_file));
-//                        downloadView.startIntro();
-                    }
-
-                    @Override
-                    public void onProgress(long current, long total) {
-                        Log.d(TAG, "downloaded: " + current + "/" + total);
-//                        downloadView.setProgress(current / total);
-                    }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onSuccess(final String path, final String name, long fileSize) {
-                        showMessage(getString(R.string.success_download_file),
-                                getString(R.string.text_app_install_now),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        processInstallApk(getContext(), path);
-                                    }
-                                });
-//                        showMessage("下载成功, path: " + path + ", size" + fileSize);
-//                        downloadView.success();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showDownloadFileError();
-//                        downloadView.fail();
-                    }
-                }));
     }
 }

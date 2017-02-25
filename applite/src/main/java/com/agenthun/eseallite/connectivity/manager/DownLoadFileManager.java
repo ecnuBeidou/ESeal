@@ -43,6 +43,14 @@ public class DownLoadFileManager {
         return instance;
     }
 
+    /**
+     * 写入磁盘
+     *
+     * @param context
+     * @param body
+     * @param fileName
+     * @return
+     */
     public boolean writeResponseBodyToDisk(Context context, ResponseBody body, String fileName) {
         String type = body.contentType().toString();
 //        Log.d(TAG, "file type: " + type);
@@ -61,29 +69,14 @@ public class DownLoadFileManager {
 //        Log.d(TAG, "file path: " + path);
 
         try {
-//            File futureStudioIconFile = new File(path); //存储在/storage/emulated/0/Android/data/包名/files/
-            File futureStudioIconFile = new File(Environment.getExternalStorageDirectory(), name); //存储在根目录/storage/emulated/0/
+            File futureStudioIconFile = new File(path); //具有访问权限, 存储在/storage/emulated/0/Android/data/包名/files/
 
             if (futureStudioIconFile.exists()) {
                 long bodySize = body.contentLength();
-                final long size;
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(futureStudioIconFile);
-                    size = fis.available();
-                } catch (IOException e) {
-                    if (callBack != null) {
-                        callBack.onError(e);
-                    }
-                    return false;
-                } finally {
-                    if (fis != null) {
-                        fis.close();
-                    }
-                }
+                final long size = futureStudioIconFile.length();
 
                 if (size == bodySize) {
-                    //大小相同,初略判断为同一文件,不下载,直接安装
+                    //大小名字相同,初略判断为同一文件,不下载,直接安装.最好判断签名,MD5等
                     if (callBack != null) {
                         handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
@@ -170,5 +163,38 @@ public class DownLoadFileManager {
             }
             return false;
         }
+    }
+
+    /**
+     * 判断是否已经下载过该文件
+     * 最好以MD5,签名等验证
+     *
+     * @param context
+     * @param fileName
+     * @return
+     */
+    public boolean isDownloaded(Context context, String fileName) {
+        boolean downloaded = false;
+
+        final String name = fileName + ".apk";
+        final String path = context.getExternalFilesDir(null) + File.separator + name;
+        File futureStudioIconFile = new File(path);
+
+        if (futureStudioIconFile.exists()) {
+            downloaded = true;
+            final long size = futureStudioIconFile.length();
+
+            if (callBack != null) {
+                handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onSuccess(path, name, size);
+                    }
+                });
+            }
+        }
+
+        return downloaded;
     }
 }
