@@ -38,7 +38,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_app"
-                android:tint="@color/colorPrimary" />
+                android:tint="@color/colorPrimaryDeepDark" />
 
             <TextView
                 android:layout_width="wrap_content"

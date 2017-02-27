@@ -7,35 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.app.AppCompatDialog;
-import android.support.v7.widget.AppCompatEditText;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.bean.User;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
-import com.agenthun.eseallite.connectivity.service.PathType;
-import com.agenthun.eseallite.utils.NetUtil;
-import com.agenthun.eseallite.utils.PreferencesHelper;
+import com.agenthun.eseallite.fragment.LoginFragment;
+import com.agenthun.eseallite.utils.ActivityUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import rx.Subscriber;
 
 /**
  * A login screen that offers login via email/password.
@@ -43,25 +27,16 @@ import rx.Subscriber;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
+
     private static final String EXTRA_SAVE_PREFERENCES = "SAVE";
+    private static final boolean ARG_SAVE_DEFAULT = false;
+
     private final int SDK_PERMISSION_REQUEST = 127;
-
-    private AppCompatEditText loginName;
-
-    private AppCompatEditText loginPassword;
-
-    private String token;
-
-    private AppCompatDialog mProgressDialog;
-
-    private PreferencesHelper.User mUser;
 
     public static void start(Activity activity, Boolean isSavePreferences) {
         Intent starter = new Intent(activity, LoginActivity.class);
         starter.putExtra(EXTRA_SAVE_PREFERENCES, isSavePreferences);
-        ActivityCompat.startActivity(activity,
-                starter,
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity).toBundle());
+        activity.startActivity(starter);
     }
 
     @Override
@@ -69,23 +44,18 @@ public class LoginActivity extends AppCompatActivity {
         setTheme(R.style.AppTheme_NoActionBar_TextAppearance);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-        loginName = (AppCompatEditText) findViewById(R.id.login_name);
-        loginPassword = (AppCompatEditText) findViewById(R.id.login_password);
+
+        boolean save = isInSaveMode();
+
+        attachLoginFragment(save);
+
+        supportPostponeEnterTransition();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         MobclickAgent.onResume(this);
-        assureUserInit();
-        if (mUser == null || isInSaveMode()) {
-            initContents();
-        } else {
-            loginName.setText(mUser.getUsername());
-            loginPassword.setText(mUser.getPassword());
-            attemptLogin();
-        }
     }
 
     @Override
@@ -93,6 +63,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         //after andrioid m, must request Permission on runtime
         getPermissions(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -106,81 +81,12 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    @OnClick(R.id.sign_in_button)
-    public void onSignInBtnClick() {
-        if (isInputDataValid()) {
-            saveUser(this);
-            attemptLogin();
-        } else {
-            Snackbar snackbar = Snackbar.make(loginName, getString(R.string.error_invalid_user), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null);
-            ((TextView) (snackbar.getView().findViewById(R.id.snackbar_text))).setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.blue_grey_100));
-            snackbar.show();
-        }
-    }
-
-/*    @OnClick(R.id.forget_password_button)
-    public void onForgetPasswordBtnClick() {
-        startActivity(new Intent(this, ForgetPasswordActivity.class));
-    }
-
-    @OnClick(R.id.sign_up_button)
-    public void onSignUpBtnClick() {
-//        startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-        startActivity(new Intent(LoginActivity.this, SignUpGridActivity.class));
-    }*/
-
-    private void attemptLogin() {
-        if (NetUtil.isConnected(this)) { //已连接网络
-            String name = mUser.getUsername();
-            String password = mUser.getPassword();
-
-            MobclickAgent.onProfileSignIn(name);
-
-            getProgressDialog().show();
-
-//            RetrofitManager.builder(PathType.BASE_WEB_SERVICE).getTokenObservable(name, password)
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST).getTokenObservable(name, password)
-                    .subscribe(new Subscriber<User>() {
-                        @Override
-                        public void onCompleted() {
-                            getProgressDialog().cancel();
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            getProgressDialog().cancel();
-                            Toast.makeText(LoginActivity.this, R.string.error_network, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onNext(User user) {
-                            if (user == null) return;
-                            if (user.getEFFECTIVETOKEN() != 1) return;
-
-                            token = user.getTOKEN();
-                            Log.d(TAG, "token: " + token);
-                            if (token != null) {
-                                PreferencesHelper.writeTokenToPreferences(LoginActivity.this, token);
-
-                                ScanNfcDeviceActivity.start(LoginActivity.this);
-                                ActivityCompat.finishAfterTransition(LoginActivity.this);
-                            } else {
-                                Toast.makeText(LoginActivity.this, R.string.error_invalid_null, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-        } else {
-            Snackbar snackbar = Snackbar.make(loginName, getString(R.string.error_network_not_open), Snackbar.LENGTH_SHORT)
-                    .setAction(getString(R.string.text_hint_open_network), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                            startActivity(intent);
-                        }
-                    });
-            ((TextView) (snackbar.getView().findViewById(R.id.snackbar_text))).setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.blue_grey_100));
-            snackbar.show();
+    private void attachLoginFragment(boolean save) {
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        LoginFragment fragment = (LoginFragment) supportFragmentManager.findFragmentById(R.id.login_container);
+        if (fragment == null) {
+            fragment = LoginFragment.newInstance(save);
+            ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.login_container);
         }
     }
 
@@ -233,52 +139,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void initContents() {
-        assureUserInit();
-        if (mUser != null) {
-            loginName.setText(mUser.getUsername());
-            loginName.setSelection(mUser.getUsername().length());
-            loginName.setFocusable(true);
-            loginPassword.setText(mUser.getPassword());
-            loginPassword.setFocusable(true);
-        }
-    }
-
-    private void assureUserInit() {
-        if (mUser == null) {
-            mUser = PreferencesHelper.getUser(this);
-        }
-    }
-
-    private void saveUser(Activity activity) {
-        PreferencesHelper.clearUser(this);
-        mUser = new PreferencesHelper.User(loginName.getText().toString(), loginPassword.getText().toString());
-        PreferencesHelper.writeUserInfoToPreferences(activity, mUser);
-    }
-
-    private boolean isInputDataValid() {
-        return PreferencesHelper.isInputDataValid(loginName.getText(), loginPassword.getText());
-    }
-
     private boolean isInSaveMode() {
         final Intent intent = getIntent();
-        boolean save = false;
+        boolean save = ARG_SAVE_DEFAULT;
         if (null != intent) {
-            save = intent.getBooleanExtra(EXTRA_SAVE_PREFERENCES, false);
+            save = intent.getBooleanExtra(EXTRA_SAVE_PREFERENCES, ARG_SAVE_DEFAULT);
         }
         return save;
-    }
-
-    private AppCompatDialog getProgressDialog() {
-        if (mProgressDialog != null) {
-            return mProgressDialog;
-        }
-        mProgressDialog = new AppCompatDialog(LoginActivity.this, AppCompatDelegate.MODE_NIGHT_AUTO);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-        mProgressDialog.setContentView(R.layout.dialog_logging_in);
-        mProgressDialog.setTitle(getString(R.string.action_login));
-        mProgressDialog.setCancelable(false);
-        return mProgressDialog;
     }
 }
 

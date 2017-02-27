@@ -130,6 +130,7 @@
     <string name="error_check_update_version">版本检测失败</string>
     <string name="text_new_app_version">新版本</string>
     <string name="text_found_new_app_version">发现新版本</string>
+    <string name="text_downloaded_new_app_version">新版本已下载</string>
     <string name="text_app_update_now">立即更新</string>
     <string name="text_app_install_now">立即安装</string>
     <string name="text_app_update_later">以后再说</string>
@@ -146,11 +147,12 @@
     <string name="text_thanks">致谢</string>
     <string name="text_thanks_name">meng</string>
     <string name="text_app_about_me">关于我</string>
-    <string name="text_copyright">Copyright \@2017 agenthun</string>
+    <string name="text_copyright">Copyright @ 2017 agenthun</string>
     <string name="text_cancel">取消</string>
     <string name="text_introduction_title_1">1.查看所有运行的NFC封锁</string>
     <string name="text_introduction_title_2">2.显示货物最新位置</string>
     <string name="text_introduction_title_3">3.查看货物详情</string>
     <string name="text_introduction_title_4">4.搜索时间段内货物的运输轨迹</string>
-    <string name="error_404_network">404 出错啦!</string>
+    <string name="error_404_network">Oops... 网页访问出错啦!</string>
+
 </resources>

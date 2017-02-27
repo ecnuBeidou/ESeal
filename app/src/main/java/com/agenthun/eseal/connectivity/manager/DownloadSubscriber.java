@@ -45,7 +45,13 @@ public class DownloadSubscriber<ResponseBody> extends Subscriber<ResponseBody> {
 
     @Override
     public void onNext(ResponseBody responseBody) {
-        DownLoadFileManager.getInstance(callBack)
-                .writeResponseBodyToDisk(mContext, (okhttp3.ResponseBody) responseBody, mFileName);
+        //根据名字,简单判断是否已下载过
+        boolean downloaded = DownLoadFileManager.getInstance(callBack)
+                .isDownloaded(mContext, mFileName);
+
+        if (!downloaded) {
+            DownLoadFileManager.getInstance(callBack)
+                    .writeResponseBodyToDisk(mContext, (okhttp3.ResponseBody) responseBody, mFileName);
+        }
     }
 }

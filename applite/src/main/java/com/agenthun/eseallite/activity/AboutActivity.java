@@ -7,16 +7,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.webkit.WebView;
 
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.fragment.AboutFragment;
-import com.agenthun.eseallite.fragment.TimePickerFragment;
 import com.agenthun.eseallite.utils.ActivityUtils;
-import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**

@@ -100,7 +100,7 @@ public class UpdateDialogActivity extends Activity implements View.OnClickListen
 
 //            mPath = DownloadManager.getInstance(mContext).getDownPath() + File.separator + url.substring(url.lastIndexOf("/") + 1, url.length());
 
-            File docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            File docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             docDir.mkdir();
 
             mPath = docDir.getAbsolutePath() + File.separator + url.substring(url.lastIndexOf("/") + 1, url.length());

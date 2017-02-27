@@ -117,6 +117,15 @@ public class UpdateResponse {
         public Entity() {
         }
 
+        public Entity(int apkSize, boolean force, String updateContent, String updateUrl, int versionCode, String versionName) {
+            ApkSize = apkSize;
+            Force = force;
+            UpdateContent = updateContent;
+            UpdateUrl = updateUrl;
+            VersionCode = versionCode;
+            VersionName = versionName;
+        }
+
         protected Entity(Parcel in) {
             this.ApkSize = in.readInt();
             this.Force = in.readByte() != 0;
@@ -126,7 +135,7 @@ public class UpdateResponse {
             this.VersionName = in.readString();
         }
 
-        public static final Creator<Entity> CREATOR = new Creator<Entity>() {
+        public static final Parcelable.Creator<Entity> CREATOR = new Parcelable.Creator<Entity>() {
             @Override
             public Entity createFromParcel(Parcel source) {
                 return new Entity(source);
@@ -217,7 +226,7 @@ public class UpdateResponse {
             this.result = in.readInt();
         }
 
-        public static final Creator<Error> CREATOR = new Creator<Error>() {
+        public static final Parcelable.Creator<Error> CREATOR = new Parcelable.Creator<Error>() {
             @Override
             public Error createFromParcel(Parcel source) {
                 return new Error(source);

@@ -84,7 +84,8 @@
             android:layout_marginRight="24dp"
             android:button="@drawable/jjdxm_update_button_check_selector"
             android:text="@string/jjdxm_update_ignore"
-            android:textColor="@color/blue_grey_700" />
+            android:textColor="@color/blue_grey_700"
+            app:buttonTint="@color/blue_grey_700" />
 
         <!-- OK&Cancel Button -->
 

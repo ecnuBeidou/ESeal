@@ -2,9 +2,7 @@ package com.agenthun.eseallite.connectivity.manager;
 
 import android.content.Context;
 
-import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
 
 /**
  * @project ESeal

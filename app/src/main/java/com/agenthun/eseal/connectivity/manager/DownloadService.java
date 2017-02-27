@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.connectivity.manager;
+package com.agenthun.eseal.connectivity.manager;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,8 +14,8 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 
-import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseal.R;
+import com.agenthun.eseal.connectivity.service.PathType;
 
 import java.io.File;
 

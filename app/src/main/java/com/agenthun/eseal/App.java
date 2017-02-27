@@ -20,6 +20,8 @@ public class App extends Application {
     private static String tagId = "043B88F2994080";
     private static String deviceId = "13003";
 
+    public static final String GOOGLE_MAP_API_KEY = "AIzaSyBy5WtHdZ7Pbe-A2N57Kbf7iR0OIgo3yuY";
+
     public LocationService locationService;
     public Vibrator mVibrator;
 

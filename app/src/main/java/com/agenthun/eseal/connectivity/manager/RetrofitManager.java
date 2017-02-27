@@ -447,6 +447,19 @@ public class RetrofitManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io());
+
+        //构造测试数据
+/*        String testDownloadUrl = "http://www.freight-track.com/files/ESeal_Lite_v_1_0_3_2017-02-25.apk";
+        return Observable
+                .just(new UpdateResponse.Entity(12537361, false,
+                        "1.谷歌地图更新\r\n2.UI更新",
+                        testDownloadUrl,
+                        100,
+                        "x.0.x"))
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());*/
     }
 
     //APP Lite 版本检测更新
@@ -470,6 +483,19 @@ public class RetrofitManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io());
+
+        //构造测试数据
+/*        String testDownloadUrl = "http://www.freight-track.com/files/ESeal_Lite_v_1_0_3_2017-02-25.apk";
+        return Observable
+                .just(new UpdateResponse.Entity(12537361, false,
+                        "1.谷歌地图更新\r\n2.UI更新",
+                        testDownloadUrl,
+                        100,
+                        "x.0.x"))
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());*/
     }
 
     /**

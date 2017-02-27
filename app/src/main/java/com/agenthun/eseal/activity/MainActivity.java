@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-         /*       double[] res = LocationUtil.getLocation(getApplicationContext());
+         /*       double[] res = LocationHelper.getLocation(getApplicationContext());
                 Snackbar.make(view, res[0] + ", " + res[1], Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();*/
 
