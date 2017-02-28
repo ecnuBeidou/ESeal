@@ -20,12 +20,12 @@ import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.activity.LoginActivity;
-import com.agenthun.eseallite.activity.TimePickerActivity;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.pagelogin.LoginActivity;
+import com.agenthun.eseallite.pagetimepicker.TimePickerActivity;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.agenthun.eseallite.view.BottomSheetDialogView;
@@ -51,8 +51,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import rx.Observer;
 
 /**
@@ -86,9 +84,7 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
     private double moveDistance = 0.0001;
     private Thread movingThread;
 
-    @Bind(R.id.bmapView)
     MapView bmapView;
-    @Bind(R.id.webView)
     WebView webView;
 
     private String mFreightId = null;
@@ -116,13 +112,15 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_freight_track_map_with_webview, container, false);
-        ButterKnife.bind(this, view);
 
         mFreightId = getArguments().getString(ARGUMENT_FREIGHT_ID);
         mFreightName = getArguments().getString(ARGUMENT_FREIGHT_NAME);
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(mOnFabClickListener);
+
+        bmapView = (MapView) view.findViewById(R.id.bmapView);
+        webView = (WebView) view.findViewById(R.id.webView);
 
         //根据当前系统语言设置加载不同的Map Ui
         mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;

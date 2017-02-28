@@ -27,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".pagelogin.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme"
@@ -39,23 +39,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ScanNfcDeviceActivity"
+            android:name=".pagescannfcdevice.ScanNfcDeviceActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.FreightTrackMapActivity"
+            android:name=".pagefreighttrackmap.FreightTrackMapActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.TimePickerActivity"
+            android:name=".pagetimepicker.TimePickerActivity"
             android:label="@string/title_pick_time"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.TextAppearance"
             android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
         <activity
-            android:name=".activity.AboutActivity"
+            android:name=".pageabout.AboutActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.TextAppearance" />

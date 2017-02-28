@@ -1,7 +1,6 @@
 package com.agenthun.eseallite;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.agenthun.eseallite.utils.update.UpdateConfig;
 

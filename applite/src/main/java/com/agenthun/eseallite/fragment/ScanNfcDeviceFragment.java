@@ -14,10 +14,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.activity.FreightTrackMapActivity;
 import com.agenthun.eseallite.adapter.NfcDeviceAdapter;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.pagefreighttrackmap.FreightTrackMapActivity;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.agenthun.eseallite.view.ScrollChildSwipeRefreshLayout;
@@ -25,8 +25,6 @@ import com.agenthun.eseallite.view.ScrollChildSwipeRefreshLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import rx.Observer;
 
 /**
@@ -39,11 +37,8 @@ public class ScanNfcDeviceFragment extends Fragment {
     private static final String TAG = "ScanNfcDeviceFragment";
     private NfcDeviceAdapter mAdapter;
 
-    @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
-    @Bind(R.id.noDevices)
     View mNoDevicesView;
-    @Bind(R.id.refresh_layout)
     ScrollChildSwipeRefreshLayout swipeRefreshLayout;
 
     public static ScanNfcDeviceFragment newInstance() {
@@ -58,7 +53,11 @@ public class ScanNfcDeviceFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_scan_nfc_device, container, false);
-        ButterKnife.bind(this, view);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        mNoDevicesView = view.findViewById(R.id.noDevices);
+
+        swipeRefreshLayout = (ScrollChildSwipeRefreshLayout) view.findViewById(R.id.refresh_layout);
 
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),

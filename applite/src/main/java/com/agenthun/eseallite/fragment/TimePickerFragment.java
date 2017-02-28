@@ -1,7 +1,6 @@
 package com.agenthun.eseallite.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -22,10 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
 /**
  * @project ESeal
  * @authors agenthun
@@ -40,9 +35,8 @@ public class TimePickerFragment extends Fragment {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private PickTimeListener mPickTimeListener;
     private TimePickerDialog mTimePickerDialog;
-    @Bind(R.id.time_from)
+
     AppCompatEditText timeFrom;
-    @Bind(R.id.time_to)
     AppCompatEditText timeTo;
 
     public static TimePickerFragment newInstance(PickTimeListener pickTimeListener) {
@@ -61,57 +55,42 @@ public class TimePickerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_time_picker, container, false);
-        ButterKnife.bind(this, view);
 
-        return view;
-    }
+        timeFrom = (AppCompatEditText) view.findViewById(R.id.time_from);
+        timeFrom.setOnClickListener(__ -> getTimePickerDialog().show(getFragmentManager(), TAG_TIME_FROM));
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
+        timeTo = (AppCompatEditText) view.findViewById(R.id.time_to);
+        timeTo.setOnClickListener(__ -> getTimePickerDialog().show(getFragmentManager(), TAG_TIME_TO));
 
-    @OnClick(R.id.time_from)
-    public void onTimeFromEtClick() {
-        Log.d(TAG, "onTimeFromEtClick() returned: ");
-        getTimePickerDialog().show(getFragmentManager(), TAG_TIME_FROM);
-    }
+        view.findViewById(R.id.pick_time_button).setOnClickListener(__ -> {
+            if (mPickTimeListener != null) {
+                String from = timeFrom.getText().toString();
+                String to = timeTo.getText().toString();
 
-    @OnClick(R.id.time_to)
-    public void onTimeToEtClick() {
-        Log.d(TAG, "onTimeToEtClick() returned: ");
-        getTimePickerDialog().show(getFragmentManager(), TAG_TIME_TO);
-    }
-
-    @OnClick(R.id.pick_time_button)
-    public void onPickTimeBtnClick() {
-        Log.d(TAG, "onPickTimeBtnClick() returned: ");
-        if (mPickTimeListener != null) {
-            String from = timeFrom.getText().toString();
-            String to = timeTo.getText().toString();
-
-            if (TextUtils.isEmpty(from)) {
-                showMessage(getString(R.string.error_time_from));
-                return;
-            }
-            if (TextUtils.isEmpty(to)) {
-                showMessage(getString(R.string.error_time_to));
-                return;
-            }
-            try {
-                Date dateFrom = DATE_FORMAT.parse(from);
-                Date dateTo = DATE_FORMAT.parse(to);
-                if (!dateTo.after(dateFrom)) {
-                    showMessage(getString(R.string.error_time_from_to));
+                if (TextUtils.isEmpty(from)) {
+                    showMessage(getString(R.string.error_time_from));
                     return;
                 }
-            } catch (ParseException e) {
-                return;
-            }
+                if (TextUtils.isEmpty(to)) {
+                    showMessage(getString(R.string.error_time_to));
+                    return;
+                }
+                try {
+                    Date dateFrom = DATE_FORMAT.parse(from);
+                    Date dateTo = DATE_FORMAT.parse(to);
+                    if (!dateTo.after(dateFrom)) {
+                        showMessage(getString(R.string.error_time_from_to));
+                        return;
+                    }
+                } catch (ParseException e) {
+                    return;
+                }
 
-            mPickTimeListener.onTimePicked(from, to);
-            getActivity().onBackPressed();
-        }
+                mPickTimeListener.onTimePicked(from, to);
+                getActivity().onBackPressed();
+            }
+        });
+        return view;
     }
 
     private void showMessage(String message) {

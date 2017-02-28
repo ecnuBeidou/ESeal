@@ -18,12 +18,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.activity.LoginActivity;
-import com.agenthun.eseallite.activity.TimePickerActivity;
 import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.pagelogin.LoginActivity;
+import com.agenthun.eseallite.pagetimepicker.TimePickerActivity;
 import com.agenthun.eseallite.utils.PreferencesHelper;
 import com.agenthun.eseallite.view.BottomSheetDialogView;
 import com.baidu.mapapi.map.BaiduMap;
@@ -48,8 +48,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import rx.Observer;
 
 /**
@@ -83,7 +81,6 @@ public class FreightTrackMapFragment extends Fragment {
     private double moveDistance = 0.0001;
     private Thread movingThread;
 
-    @Bind(R.id.bmapView)
     MapView bmapView;
 
     private String mFreightId = null;
@@ -109,13 +106,14 @@ public class FreightTrackMapFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_freight_track_map, container, false);
-        ButterKnife.bind(this, view);
 
         mFreightId = getArguments().getString(ARGUMENT_FREIGHT_ID);
         mFreightName = getArguments().getString(ARGUMENT_FREIGHT_NAME);
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(mOnFabClickListener);
+
+        bmapView = (MapView) view.findViewById(R.id.bmapView);
 
         mHandler = new Handler();
         return view;

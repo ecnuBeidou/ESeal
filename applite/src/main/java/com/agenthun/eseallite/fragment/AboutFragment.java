@@ -38,9 +38,6 @@ import com.pekingopera.versionupdate.util.FileUtils;
 
 import java.io.File;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import rx.Subscriber;
 
 /**
@@ -56,23 +53,15 @@ public class AboutFragment extends Fragment {
 
     Toolbar toolbar;
 
-    @Bind(R.id.about_content)
     View aboutContent;
-    @Bind(R.id.web_content)
     View webContent;
-    @Bind(R.id.webView)
     WebView webView;
-    @Bind(R.id.progress)
     ContentLoadingProgressBar progressBar;
-    @Bind(R.id.web_error_content)
     View webErrorContent;
 
-    @Bind(R.id.app_version_name)
     AppCompatTextView appVersionName;
 
-    @Bind(R.id.app_new_version_hint)
     AppCompatTextView appNewVersionHint;
-    @Bind(R.id.app_new_version_name)
     AppCompatTextView appNewVersionName;
 
     public static AboutFragment newInstance() {
@@ -88,10 +77,28 @@ public class AboutFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_about, container, false);
-        ButterKnife.bind(this, view);
+
+        aboutContent = view.findViewById(R.id.about_content);
+
+        webContent = view.findViewById(R.id.web_content);
+        webView = (WebView) view.findViewById(R.id.webView);
+        progressBar = (ContentLoadingProgressBar) view.findViewById(R.id.progress);
+        webErrorContent = view.findViewById(R.id.web_error_content);
+
+        appVersionName = (AppCompatTextView) view.findViewById(R.id.app_version_name);
+        appNewVersionHint = (AppCompatTextView) view.findViewById(R.id.app_new_version_hint);
+        appNewVersionName = (AppCompatTextView) view.findViewById(R.id.app_new_version_name);
 
         String versionName = VersionHelper.getVersionName(getContext());
         appVersionName.setText(versionName);
+
+        view.findViewById(R.id.update_version_area).setOnClickListener(__ -> checkUpdateVersion(false));
+
+        view.findViewById(R.id.app_introduction).setOnClickListener(__ -> showIntroduction());
+
+        view.findViewById(R.id.app_thanks).setOnClickListener(__ -> showThanks());
+
+        view.findViewById(R.id.app_about_me).setOnClickListener(__ -> showAboutMe());
 
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -111,32 +118,6 @@ public class AboutFragment extends Fragment {
 
         checkUpdateVersion(true);
         return view;
-    }
-
-    @OnClick({R.id.update_version_area, R.id.app_introduction, R.id.app_thanks, R.id.app_about_me})
-    public void onClick(View v) {
-        int id = v.getId();
-
-        switch (id) {
-            case R.id.update_version_area:
-                Log.d(TAG, "onClick() returned: update_version_area");
-                checkUpdateVersion(false);
-                break;
-            case R.id.app_introduction:
-                Log.d(TAG, "onClick() returned: app_introduction");
-                showIntroduction();
-                break;
-            case R.id.app_thanks:
-                Log.d(TAG, "onClick() returned: app_thanks");
-                showThanks();
-                break;
-            case R.id.app_about_me:
-                Log.d(TAG, "onClick() returned: app_about_me");
-                showAboutMe();
-                break;
-            default:
-                break;
-        }
     }
 
     private void setupWebView() {

@@ -141,10 +141,7 @@ public class RetrofitManager {
 
     //登陆,获取token
     public Observable<User> getTokenObservable(String userName, String password) {
-        return freightTrackWebService.getToken(userName, password, LanguageUtil.getLanguage())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+        return freightTrackWebService.getToken(userName, password, LanguageUtil.getLanguage());
     }
 
     /**
