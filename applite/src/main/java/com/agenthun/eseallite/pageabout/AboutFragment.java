@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.fragment;
+package com.agenthun.eseallite.pageabout;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +32,7 @@ import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
 import com.agenthun.eseallite.connectivity.manager.DownloadService;
 import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
 import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.pagescannfcdevice.ScanNfcDeviceContract;
 import com.agenthun.eseallite.utils.ApiLevelHelper;
 import com.agenthun.eseallite.utils.VersionHelper;
 import com.pekingopera.versionupdate.util.FileUtils;
@@ -46,7 +47,7 @@ import rx.Subscriber;
  * @date 2017/2/22 11:58.
  */
 
-public class AboutFragment extends Fragment {
+public class AboutFragment extends Fragment implements AboutContract.View {
     private static final String TAG = "AboutFragment";
 
     private static final String MY_HOME_PAGE_URL = "https://agenthun.github.io";
@@ -63,6 +64,8 @@ public class AboutFragment extends Fragment {
 
     AppCompatTextView appNewVersionHint;
     AppCompatTextView appNewVersionName;
+
+    private AboutContract.Presenter mPresenter;
 
     public static AboutFragment newInstance() {
 
@@ -92,7 +95,7 @@ public class AboutFragment extends Fragment {
         String versionName = VersionHelper.getVersionName(getContext());
         appVersionName.setText(versionName);
 
-        view.findViewById(R.id.update_version_area).setOnClickListener(__ -> checkUpdateVersion(false));
+        view.findViewById(R.id.update_version_area).setOnClickListener(__ -> mPresenter.checkUpdateVersion(false));
 
         view.findViewById(R.id.app_introduction).setOnClickListener(__ -> showIntroduction());
 
@@ -101,23 +104,36 @@ public class AboutFragment extends Fragment {
         view.findViewById(R.id.app_about_me).setOnClickListener(__ -> showAboutMe());
 
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webContent.getVisibility() == View.VISIBLE) {
-                    webContent.setVisibility(View.GONE);
-                    aboutContent.setVisibility(View.VISIBLE);
-                    toolbar.setTitle(R.string.about);
-                } else if (webContent.getVisibility() == View.GONE) {
-                    getActivity().onBackPressed();
-                }
+        toolbar.setNavigationOnClickListener(__ -> {
+            if (webContent.getVisibility() == View.VISIBLE) {
+                webContent.setVisibility(View.GONE);
+                aboutContent.setVisibility(View.VISIBLE);
+                toolbar.setTitle(R.string.about);
+            } else if (webContent.getVisibility() == View.GONE) {
+                getActivity().onBackPressed();
             }
         });
 
         setupWebView();
 
-        checkUpdateVersion(true);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void setPresenter(AboutContract.Presenter presenter) {
+        mPresenter = presenter;
     }
 
     private void setupWebView() {
@@ -180,7 +196,8 @@ public class AboutFragment extends Fragment {
         });
     }
 
-    private void showWebView() {
+    @Override
+    public void showWebView() {
         webView.loadUrl(MY_HOME_PAGE_URL);
 
         aboutContent.setVisibility(View.GONE);
@@ -194,7 +211,8 @@ public class AboutFragment extends Fragment {
         webErrorContent.setVisibility(View.GONE);
     }
 
-    private void showWebViewLoadError() {
+    @Override
+    public void showWebViewLoadError() {
         webView.setVisibility(View.GONE);
 
         progressBar.setVisibility(View.GONE);
@@ -203,34 +221,67 @@ public class AboutFragment extends Fragment {
         webErrorContent.setVisibility(View.VISIBLE);
     }
 
-    private void showIntroduction() {
+    @Override
+    public void showIntroduction() {
         showDialog(getString(R.string.text_app_introduction), R.layout.dialog_introduction,
                 getString(R.string.text_ok), null);
     }
 
-    private void showThanks() {
+    @Override
+    public void showThanks() {
         showDialog(getString(R.string.text_thanks), getString(R.string.text_thanks_name),
                 null, null, null, null);
     }
 
-    private void showAboutMe() {
+    @Override
+    public void showAboutMe() {
         toolbar.setTitle(R.string.text_app_about_me);
         showWebView();
     }
 
-    private void showNoNewVersion() {
+    @Override
+    public void showNoNewVersion() {
         appNewVersionHint.setVisibility(View.GONE);
         appNewVersionName.setVisibility(View.GONE);
     }
 
-    private void showNewVersion(String newVersionName) {
+    @Override
+    public void showNewVersion(String newVersionName) {
         appNewVersionHint.setVisibility(View.VISIBLE);
         appNewVersionName.setVisibility(View.VISIBLE);
         appNewVersionName.setText(newVersionName);
     }
 
-    private void showCheckUpdateVersionError() {
+    @Override
+    public void showCheckUpdateVersionError() {
         showMessage(getString(R.string.error_check_update_version));
+    }
+
+    @Override
+    public void showNewVersionFound(String message, String url, String name) {
+        showDialog(getString(R.string.text_found_new_app_version),
+                message,
+                getString(R.string.text_app_update_now),
+                (dialog, which) -> DownloadService.start(getContext(), url, name), //下载显示方式Notification进度条
+                getString(R.string.text_app_update_later),
+                null
+        );
+    }
+
+    @Override
+    public void showNewVersionDownloaded(String message, String path) {
+        showDialog(getString(R.string.text_downloaded_new_app_version),
+                message,
+                getString(R.string.text_app_install_now),
+                (dialog, which) -> processInstallApk(getContext(), path),
+                getString(R.string.text_app_update_later),
+                null
+        );
+    }
+
+    @Override
+    public void showAlreadyLatestVersion() {
+        showMessage(getString(R.string.text_app_already_the_latest_version));
     }
 
     private void showMessage(String message) {
@@ -287,93 +338,5 @@ public class AboutFragment extends Fragment {
         intent.setDataAndType(Uri.fromFile(new File(path)),
                 "application/vnd.android.package-archive");
         ContextCompat.startActivity(context, intent, null);
-    }
-
-    private void processUpdateVersion(boolean auto, final UpdateResponse.Entity entity) {
-        if (entity == null) {
-            showCheckUpdateVersionError();
-        }
-        //有更新版本
-        if (entity.getVersionCode() > Integer.parseInt(VersionHelper.getVersionCode(getContext()))) {
-            showNewVersion(entity.getVersionName());
-        } else {
-            showNoNewVersion();
-        }
-
-        if (!auto) {
-//            entity.setVersionCode(100); //for my test download
-
-            if (entity.getVersionCode() > Integer.parseInt(VersionHelper.getVersionCode(getContext()))) {
-                String message = getString(R.string.text_update_latest_version) + entity.getVersionName().trim() + "\n" +
-                        getString(R.string.text_update_version_size) +
-                        FileUtils.HumanReadableFilesize(entity.getApkSize()) + "\n\n" +
-                        getString(R.string.text_update_version_content) + "\n" +
-                        entity.getUpdateContent().replace("\\r\\n", "\r\n");
-
-                String packageName = VersionHelper.getPackageName(getContext());
-                final String name = packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length())
-                        + "_v_" + entity.getVersionName().replaceAll("\\.", "_").trim();
-
-                final String path = getContext().getExternalFilesDir(null) + File.separator + name + ".apk";
-                File futureStudioIconFile = new File(path);
-
-                if (futureStudioIconFile.exists()) {
-                    //文件已下载
-                    showDialog(getString(R.string.text_downloaded_new_app_version),
-                            message,
-                            getString(R.string.text_app_install_now),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    processInstallApk(getContext(), path);
-                                }
-                            },
-                            getString(R.string.text_app_update_later),
-                            null
-                    );
-                } else {
-                    //文件未下载
-                    showDialog(getString(R.string.text_found_new_app_version),
-                            message,
-                            getString(R.string.text_app_update_now),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    DownloadService.start(getContext(), entity.getUpdateUrl(), name);//下载显示方式Notification进度条
-                                }
-                            },
-                            getString(R.string.text_app_update_later),
-                            null
-                    );
-                }
-            } else {
-                showMessage(getString(R.string.text_app_already_the_latest_version));
-            }
-        }
-    }
-
-    private void checkUpdateVersion(final boolean auto) {
-        RetrofitManager.builder(PathType.ESeal_LITE_UPDATE_SERVICE_URL)
-                .checkAppLiteUpdateObservable()
-                .subscribe(new Subscriber<UpdateResponse.Entity>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (!auto) {
-                            showCheckUpdateVersionError();
-                        } else {
-                            Log.d(TAG, "Error - auto checkUpdateVersion");
-                        }
-                    }
-
-                    @Override
-                    public void onNext(UpdateResponse.Entity entity) {
-                        processUpdateVersion(auto, entity);
-                    }
-                });
     }
 }

@@ -11,15 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.fragment.ScanNfcDeviceFragment;
 import com.agenthun.eseallite.pageabout.AboutActivity;
 import com.agenthun.eseallite.pagelogin.LoginActivity;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.PreferencesHelper;
+import com.agenthun.eseallite.utils.scheduler.SchedulerProvider;
 import com.pekingopera.versionupdate.UpdateHelper;
 import com.pekingopera.versionupdate.listener.ForceListener;
-
-import butterknife.ButterKnife;
 
 /**
  * @project ESeal
@@ -58,6 +56,11 @@ public class ScanNfcDeviceActivity extends AppCompatActivity {
             fragment = ScanNfcDeviceFragment.newInstance();
             ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
         }
+
+        new ScanNfcDevicePresenter(
+                getApplicationContext(),
+                fragment,
+                SchedulerProvider.getInstance());
     }
 
     @Override

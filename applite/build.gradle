@@ -134,4 +134,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:10.0.1'
     compile 'com.google.maps:google-maps-services:0.1.17'
     compile project(':versionupdate')
+    compile 'com.jakewharton:butterknife:7.0.1'
 }

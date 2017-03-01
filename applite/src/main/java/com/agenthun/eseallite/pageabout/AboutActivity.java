@@ -9,10 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.fragment.AboutFragment;
 import com.agenthun.eseallite.utils.ActivityUtils;
-
-import butterknife.ButterKnife;
+import com.agenthun.eseallite.utils.scheduler.BaseSchedulerProvider;
+import com.agenthun.eseallite.utils.scheduler.SchedulerProvider;
 
 /**
  * @project ESeal
@@ -37,12 +36,6 @@ public class AboutActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setTitle(R.string.about);
         setSupportActionBar(toolbar);
-/*        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });*/
 
         attachDeviceFragment();
 
@@ -62,5 +55,9 @@ public class AboutActivity extends AppCompatActivity {
             fragment = AboutFragment.newInstance();
             ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
         }
+
+        new AboutPresenter(getApplicationContext(),
+                fragment,
+                SchedulerProvider.getInstance());
     }
 }

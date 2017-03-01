@@ -238,10 +238,7 @@ public class RetrofitManager {
 
                         return result;
                     }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+                });
     }
 
 
