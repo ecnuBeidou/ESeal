@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.fragment;
+package com.agenthun.eseallite.pagetimepicker;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -27,7 +27,7 @@ import java.util.Date;
  * @date 2017/2/15 15:40.
  */
 
-public class TimePickerFragment extends Fragment {
+public class TimePickerFragment extends Fragment implements TimePickerContract.View {
     private static final String TAG = "TimePickerFragment";
     private static final String TAG_TIME_FROM = "TAG_TIME_FROM";
     private static final String TAG_TIME_TO = "TAG_TIME_TO";
@@ -39,15 +39,14 @@ public class TimePickerFragment extends Fragment {
     AppCompatEditText timeFrom;
     AppCompatEditText timeTo;
 
+    private TimePickerContract.Presenter mPresenter;
+
     public static TimePickerFragment newInstance(PickTimeListener pickTimeListener) {
         TimePickerFragment fragment = new TimePickerFragment();
         if (pickTimeListener != null) {
             fragment.mPickTimeListener = pickTimeListener;
         }
         return fragment;
-    }
-
-    public TimePickerFragment() {
     }
 
     @Override
@@ -68,18 +67,18 @@ public class TimePickerFragment extends Fragment {
                 String to = timeTo.getText().toString();
 
                 if (TextUtils.isEmpty(from)) {
-                    showMessage(getString(R.string.error_time_from));
+                    showPickBeginTimeNullError();
                     return;
                 }
                 if (TextUtils.isEmpty(to)) {
-                    showMessage(getString(R.string.error_time_to));
+                    showPickEndTimeNullError();
                     return;
                 }
                 try {
                     Date dateFrom = DATE_FORMAT.parse(from);
                     Date dateTo = DATE_FORMAT.parse(to);
                     if (!dateTo.after(dateFrom)) {
-                        showMessage(getString(R.string.error_time_from_to));
+                        showPickTimeLogicError();
                         return;
                     }
                 } catch (ParseException e) {
@@ -91,6 +90,38 @@ public class TimePickerFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void setPresenter(TimePickerContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
+    @Override
+    public void showPickBeginTimeNullError() {
+        showMessage(getString(R.string.error_time_from));
+    }
+
+    @Override
+    public void showPickEndTimeNullError() {
+        showMessage(getString(R.string.error_time_to));
+    }
+
+    @Override
+    public void showPickTimeLogicError() {
+        showMessage(getString(R.string.error_time_from_to));
     }
 
     private void showMessage(String message) {

@@ -11,11 +11,10 @@ import android.view.View;
 
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.fragment.TimePickerFragment;
+import com.agenthun.eseallite.pagescannfcdevice.ScanNfcDevicePresenter;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
-
-import butterknife.ButterKnife;
+import com.agenthun.eseallite.utils.scheduler.SchedulerProvider;
 
 /**
  * @project ESeal
@@ -72,6 +71,11 @@ public class TimePickerActivity extends AppCompatActivity {
             fragment = TimePickerFragment.newInstance(mPickTimeListener);
             ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
         }
+
+        new TimePickerPresenter(
+                getApplicationContext(),
+                fragment,
+                SchedulerProvider.getInstance());
     }
 
     private TimePickerFragment.PickTimeListener mPickTimeListener = new TimePickerFragment.PickTimeListener() {
