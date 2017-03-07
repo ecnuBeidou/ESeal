@@ -277,7 +277,14 @@ public class RetrofitManager {
                                 String uploadType = deviceLocation.getUploadType();
                                 String securityLevel = deviceLocation.getSecurityLevel();
                                 String closedFlag = deviceLocation.getClosedFlag();
-                                String[] location = deviceLocation.getBaiduCoordinate().split(",");
+
+                                String coordinate = deviceLocation.getBaiduCoordinate();
+                                //去除无效数据
+                                if (coordinate.isEmpty() || !coordinate.contains(",")) {
+                                    continue;
+                                }
+
+                                String[] location = coordinate.split(",");
                                 LatLng latLng = new LatLng(
                                         Double.parseDouble(location[0]),
                                         Double.parseDouble(location[1])
