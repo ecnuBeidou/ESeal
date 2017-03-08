@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.agenthun.eseallite.view;
+package com.agenthun.eseallite.pagescannfcdevice.view;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;

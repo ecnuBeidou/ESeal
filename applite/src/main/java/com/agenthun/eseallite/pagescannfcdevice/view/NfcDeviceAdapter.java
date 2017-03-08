@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.adapter;
+package com.agenthun.eseallite.pagescannfcdevice.view;
 
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;

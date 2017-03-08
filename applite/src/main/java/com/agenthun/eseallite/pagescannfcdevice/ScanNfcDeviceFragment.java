@@ -13,11 +13,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.adapter.NfcDeviceAdapter;
+import com.agenthun.eseallite.pagescannfcdevice.view.NfcDeviceAdapter;
 import com.agenthun.eseallite.pagefreighttrackmap.FreightTrackMapActivity;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
 import com.agenthun.eseallite.utils.PreferencesHelper;
-import com.agenthun.eseallite.view.ScrollChildSwipeRefreshLayout;
+import com.agenthun.eseallite.pagescannfcdevice.view.ScrollChildSwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -28,7 +28,7 @@ import com.agenthun.eseallite.pagelogin.LoginActivity;
 import com.agenthun.eseallite.pagetimepicker.TimePickerActivity;
 import com.agenthun.eseallite.utils.LanguageUtil;
 import com.agenthun.eseallite.utils.PreferencesHelper;
-import com.agenthun.eseallite.view.BottomSheetDialogView;
+import com.agenthun.eseallite.pagefreighttrackmap.view.BottomSheetDialogView;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;

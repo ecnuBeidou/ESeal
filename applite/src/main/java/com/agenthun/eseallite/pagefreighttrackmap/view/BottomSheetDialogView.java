@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.view;
+package com.agenthun.eseallite.pagefreighttrackmap.view;
 
 import android.content.Context;
 import android.support.design.widget.BottomSheetDialog;
