@@ -1,9 +1,8 @@
-package com.agenthun.eseallite.fragment;
+package com.agenthun.eseallite.pagefreighttrackmap;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,17 +14,17 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.bean.base.DeviceLocation;
 import com.agenthun.eseallite.bean.base.LocationDetail;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
-import com.agenthun.eseallite.connectivity.service.PathType;
+import com.agenthun.eseallite.pagefreighttrackmap.view.BottomSheetDialogView;
 import com.agenthun.eseallite.pagelogin.LoginActivity;
 import com.agenthun.eseallite.pagetimepicker.TimePickerActivity;
+import com.agenthun.eseallite.utils.LanguageUtil;
 import com.agenthun.eseallite.utils.PreferencesHelper;
-import com.agenthun.eseallite.pagefreighttrackmap.view.BottomSheetDialogView;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -42,13 +41,10 @@ import com.baidu.mapapi.utils.SpatialRelationUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import rx.Observer;
 
 /**
  * @project ESeal
@@ -56,7 +52,7 @@ import rx.Observer;
  * @date 2017/2/15 10:53.
  */
 
-public class FreightTrackMapFragment extends Fragment {
+public class FreightTrackMapWithWebViewFragment extends Fragment implements FreightTrackMapWithWebViewContract.View {
     private static final String TAG = "FreightTrackMapFragment";
 
     private static final String ARGUMENT_FREIGHT_ID = "ARGUMENT_FREIGHT_ID";
@@ -82,38 +78,47 @@ public class FreightTrackMapFragment extends Fragment {
     private Thread movingThread;
 
     MapView bmapView;
+    WebView webView;
 
     private String mFreightId = null;
     private String mFreightName = null;
     private boolean mIsFreightTrackMode = false;
-    private LocationDetail mLocationDetail = null;
-    private List<LocationDetail> mLocationDetailList = new ArrayList<>();
 
-    public static FreightTrackMapFragment newInstance(String id, String name) {
+    private boolean mUsingWebView = false;
+
+    private FreightTrackMapWithWebViewContract.Presenter mPresenter;
+
+    public static FreightTrackMapWithWebViewFragment newInstance(String id, String name) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_FREIGHT_ID, id);
         arguments.putString(ARGUMENT_FREIGHT_NAME, name);
-        FreightTrackMapFragment fragment = new FreightTrackMapFragment();
+        FreightTrackMapWithWebViewFragment fragment = new FreightTrackMapWithWebViewFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    public FreightTrackMapFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_freight_track_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_freight_track_map_with_webview, container, false);
 
         mFreightId = getArguments().getString(ARGUMENT_FREIGHT_ID);
         mFreightName = getArguments().getString(ARGUMENT_FREIGHT_NAME);
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setOnClickListener(mOnFabClickListener);
+        fab.setOnClickListener(__ -> mPresenter.loadFreightDataListDetail(mIsFreightTrackMode));
 
         bmapView = (MapView) view.findViewById(R.id.bmapView);
+        webView = (WebView) view.findViewById(R.id.webView);
+
+        //根据当前系统语言设置加载不同的Map Ui
+        mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
+//        mUsingWebView = true; //for test webviewMap
+        setupMapUi(mUsingWebView);
+        if (mUsingWebView) {
+            setupWebView();
+        }
 
         mHandler = new Handler();
         return view;
@@ -122,7 +127,7 @@ public class FreightTrackMapFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setupBaiduMap();
-        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
+        mPresenter.subscribe();
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -136,6 +141,7 @@ public class FreightTrackMapFragment extends Fragment {
     public void onPause() {
         super.onPause();
         bmapView.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Override
@@ -154,7 +160,7 @@ public class FreightTrackMapFragment extends Fragment {
                 return true;
             case R.id.action_location_search:
                 mIsFreightTrackMode = false;
-                loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
+                mPresenter.loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
                 return true;
             case R.id.action_sign_out:
                 signOut(true);
@@ -167,52 +173,37 @@ public class FreightTrackMapFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == TimePickerActivity.RESULT_PICK_TIME) {
-            String from = data.getStringExtra(TimePickerActivity.PICK_TIME_FROM);
-            String to = data.getStringExtra(TimePickerActivity.PICK_TIME_TO);
-            Log.d(TAG, "from: " + from + ", to: " + to);
+    public void setPresenter(FreightTrackMapWithWebViewContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
 
-            loadFreightLocation(true, PreferencesHelper.getTOKEN(getActivity()),
-                    mFreightId, from, to);
-        }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mPresenter.result(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private View.OnClickListener mOnFabClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (mIsFreightTrackMode) {
-                if (mLocationDetailList != null && !mLocationDetailList.isEmpty()) {
-                    showFreightDataListByBottomSheet(PreferencesHelper.getTOKEN(getActivity()),
-                            mFreightId, mFreightName, mLocationDetailList);
-                }
-            } else {
-                if (mLocationDetail != null) {
-                    showFreightDataListByBottomSheet(PreferencesHelper.getTOKEN(getActivity()),
-                            mFreightId, mFreightName, Arrays.asList(mLocationDetail));
-                }
-            }
-        }
-    };
-
-    /**
-     * 设置百度地图属性
-     */
-    private void setupBaiduMap() {
-        bmapView.showZoomControls(false); //移除地图缩放控件
-        bmapView.removeViewAt(1); //移除百度地图Logo
-
-        mBaiduMap = bmapView.getMap();
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(16));
-        mBaiduMap.getUiSettings().setOverlookingGesturesEnabled(false); //取消俯视手势
+    private void setupWebView() {
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setBuiltInZoomControls(true);
     }
 
-    /**
-     * 清除百度地图覆盖物
-     */
-    private void clearLocationData() {
+    @Override
+    public void setupMapUi(boolean usingWebView) {
+        if (usingWebView) {
+            bmapView.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+        } else {
+            bmapView.setVisibility(View.VISIBLE);
+            webView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void clearLocationData() {
         mBaiduMap.clear();
         if (mVirtureRoad != null && mVirtureRoad.getPoints().size() > 0) {
             mVirtureRoad.remove();
@@ -238,42 +229,8 @@ public class FreightTrackMapFragment extends Fragment {
         }
     }
 
-    private List<LocationDetail> locationInfosToLocationDetailList(List<DeviceLocation> details) {
-        List<LocationDetail> result = new ArrayList<LocationDetail>();
-        if (details == null || details.size() == 0) return result;
-
-        //GPS坐标转百度地图坐标
-//        CoordinateConverter converter = new CoordinateConverter();
-//        converter.from(CoordinateConverter.CoordType.GPS);
-        for (DeviceLocation detail :
-                details) {
-            if (detail.isInvalid()) continue;
-
-            String time = detail.getReportTime();
-            String uploadType = detail.getUploadType();
-            String securityLevel = detail.getSecurityLevel();
-            String closedFlag = detail.getClosedFlag();
-            if (uploadType.equals("0")) {
-                time = utc2Local(time, "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss");
-            }
-
-            String[] location = detail.getBaiduCoordinate().split(",");
-            LatLng lng = new LatLng(
-                    Double.parseDouble(location[0]),
-                    Double.parseDouble(location[1])
-            );
-//            converter.coord(lng);
-//            lng = converter.convert();
-            result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng));
-        }
-
-        return result;
-    }
-
-    /**
-     * 加载轨迹数据至百度地图
-     */
-    private void showBaiduMap(List<LocationDetail> locationDetails) {
+    @Override
+    public void showBaiduMap(List<LocationDetail> locationDetails) {
         if (locationDetails == null || locationDetails.size() == 0) return;
 
         int countInCircle = 0;
@@ -317,10 +274,10 @@ public class FreightTrackMapFragment extends Fragment {
             movingThread = new Thread(new MyThread());
             movingThread.start();
         }
-
     }
 
-    private void showBaiduMap(LocationDetail locationDetail) {
+    @Override
+    public void showBaiduMap(LocationDetail locationDetail) {
         if (locationDetail == null || locationDetail.isInvalid()) {
             return;
         }
@@ -332,6 +289,164 @@ public class FreightTrackMapFragment extends Fragment {
 
         //设置中心点
         mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(lng, 16));
+    }
+
+    @Override
+    public void showWebViewMap(List<LocationDetail> locationDetails) {
+        if (locationDetails == null || locationDetails.size() == 0) return;
+
+        final List<LatLng> polylines = new ArrayList<>();
+        for (LocationDetail locationDetail :
+                locationDetails) {
+            if (locationDetail.isInvalid()) continue;
+
+            LatLng lng = locationDetail.getLatLng();
+            polylines.add(lng);
+        }
+
+        Collections.reverse(polylines); //按时间正序
+
+        webView.post(new Runnable() {
+            @Override
+            public void run() {
+                String data = buildHtmlMap(polylines);
+//                String data = buildHtmlSample();
+
+                //loadData不支持#、%、\、? 四种字符，用loadDataWithBaseURL
+                webView.loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
+            }
+        });
+    }
+
+    @Override
+    public void showLoadingFreightLocationError() {
+        showMessage(getString(R.string.error_query_freight_location));
+    }
+
+    @Override
+    public void showNoFreightLocationData() {
+        showMessage(getString(R.string.warn_query_freight_location_no_data));
+    }
+
+    @Override
+    public void startTimePickerActivity() {
+        Intent startIntent = TimePickerActivity.getStartIntent(getContext());
+        startActivityForResult(startIntent, TimePickerActivity.REQUEST_PICK_TIME);
+    }
+
+    @Override
+    public void showFreightDataListByBottomSheet(String token, String containerId, String containerNo, List<LocationDetail> details) {
+        BottomSheetDialogView.show(getContext(), containerNo, details);
+    }
+
+    /**
+     * 设置百度地图属性
+     */
+    private void setupBaiduMap() {
+        bmapView.showZoomControls(false); //移除地图缩放控件
+        bmapView.removeViewAt(1); //移除百度地图Logo
+
+        mBaiduMap = bmapView.getMap();
+        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(16));
+        mBaiduMap.getUiSettings().setOverlookingGesturesEnabled(false); //取消俯视手势
+    }
+
+    private String buildHtmlSample() {
+        return "<html><body><font color='red'>hello baidu!</font></body></html>";
+    }
+
+    private String buildHtmlMap(List<LatLng> polylines) {
+        StringBuffer html = new StringBuffer();
+
+        double minLat = polylines.get(0).latitude;
+        double maxLat = polylines.get(0).latitude;
+        double minLng = polylines.get(0).longitude;
+        double maxLng = polylines.get(0).longitude;
+
+        LatLng point;
+
+        html.append("<!DOCTYPE html>");
+        html.append("<head>");
+        html.append("<meta charset='utf-8'>");
+        html.append("<style>");
+        html.append("#map {height: 100%;}");
+        html.append("html, body {height: 100%;margin: 0;padding: 0;}");
+        html.append("</style>");
+        html.append("</head>");
+        html.append("<body>");
+        html.append("<div id='map'></div>");
+        html.append("<script>");
+        html.append("var neighborhoods = [");
+
+        html.append("{lat: " + minLat + ", lng: " + minLng + "},");
+
+        for (int i = 1; i < polylines.size(); i++) {
+            point = polylines.get(i);
+            if (point.latitude < minLat) minLat = point.latitude;
+            if (point.latitude > maxLat) maxLat = point.latitude;
+            if (point.longitude < minLng) minLng = point.longitude;
+            if (point.longitude > maxLng) maxLng = point.longitude;
+
+            html.append("{lat: " + point.latitude + ", lng: " + point.longitude + "},");
+        }
+
+        //设置中心点,以及缩放参数
+        double centerLat = (maxLat + minLat) / 2;
+        double centerLng = (maxLng + minLng) / 2;
+        int zoom = getGoogleMapZoom(minLat, maxLat, minLng, maxLng);
+
+        html.deleteCharAt(html.lastIndexOf(","));
+
+        html.append("];");
+        html.append("var markers = [];");
+        html.append("var map;");
+        html.append("function initMap() {");
+        html.append("map = new google.maps.Map(document.getElementById('map'), {");
+        html.append("zoom: " + zoom + ",");
+        html.append("center: {lat: " + centerLat + ", lng: " + centerLng + "}");
+        html.append("});");
+
+        if (polylines.size() == 1) {
+            html.append("drop();");
+        }
+
+        html.append("var flightPath = new google.maps.Polyline({");
+        html.append("path: neighborhoods,");
+        html.append("geodesic: true,");
+        html.append("strokeColor: '#FF0000',");
+        html.append("strokeOpacity: 1.0,");
+        html.append("strokeWeight: 2");
+        html.append("});");
+        html.append("flightPath.setMap(map);");
+        html.append("}");
+        html.append("function drop() {");
+        html.append("clearMarkers();");
+        html.append("for (var i = 0; i < neighborhoods.length; i++) {");
+        html.append("addMarkerWithTimeout(neighborhoods[i], i * 200);");
+        html.append("}");
+        html.append("}");
+        html.append("function addMarkerWithTimeout(position, timeout) {");
+        html.append("window.setTimeout(function() {");
+        html.append("markers.push(new google.maps.Marker({");
+        html.append("position: position,");
+        html.append("map: map");
+//        html.append("animation: google.maps.Animation.DROP");
+        html.append("}));");
+        html.append("}, timeout);");
+        html.append("}");
+        html.append("function clearMarkers() {");
+        html.append("for (var i = 0; i < markers.length; i++) {");
+        html.append("markers[i].setMap(null);");
+        html.append("}");
+        html.append("markers = [];");
+        html.append("}");
+        html.append("</script>");
+        html.append("<script async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAp2aNol3FhJypghIA2IUZIOkNTwo6YPbY&callback=initMap'></script>");
+        html.append("</body>");
+        html.append("</html>");
+
+        return html.toString();
     }
 
     /**
@@ -386,6 +501,32 @@ public class FreightTrackMapFragment extends Fragment {
     }
 
     /**
+     * 获取Google地图显示等级
+     * 范围0-18级
+     */
+    private int getGoogleMapZoom(double minLat, double maxLat, double minLng, double maxLng) {
+        LatLng minLatLng = new LatLng(minLat, minLng);
+        LatLng maxLatLng = new LatLng(maxLat, maxLng);
+        double distance = DistanceUtil.getDistance(minLatLng, maxLatLng);
+
+        if (distance == 0.0d) {
+            return 12;
+        }
+        if (distance > 0.0d && distance <= 100.0d) {
+            return 18;
+        }
+
+        for (int i = 0; i < BAIDU_MAP_ZOOM.length; i++) {
+            if (BAIDU_MAP_ZOOM[i] - distance > 0) {
+                moveDistance = (BAIDU_MAP_ZOOM[i] - distance) / DISTANCE_RATIO;
+                Log.d(TAG, "getZoom() moveDistance = " + moveDistance);
+                return 18 - i;
+            }
+        }
+        return 12;
+    }
+
+    /**
      * 根据点获取图标转的角度
      */
     private double getAngle(int startIndex) {
@@ -422,7 +563,6 @@ public class FreightTrackMapFragment extends Fragment {
      * 根据点和斜率算取截距
      */
     private double getInterception(double slope, LatLng point) {
-
         double interception = point.latitude - slope * point.longitude;
         return interception;
     }
@@ -478,88 +618,12 @@ public class FreightTrackMapFragment extends Fragment {
         return localTime;
     }
 
-    private void showLoadingFreightLocationError() {
-        showMessage(getString(R.string.error_query_freight_location));
-    }
-
-    private void showNoFreightLocationData() {
-        showMessage(getString(R.string.warn_query_freight_location_no_data));
-    }
-
     private void showMessage(String message) {
         Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null);
         ((TextView) (snackbar.getView().findViewById(R.id.snackbar_text)))
                 .setTextColor(ContextCompat.getColor(getContext(), R.color.blue_grey_100));
         snackbar.show();
-    }
-
-    private void loadFreightLocation(final boolean isFreightTrackMode,
-                                     @NonNull final String token, @NonNull String id,
-                                     @Nullable String from, @Nullable String to) {
-        if (isFreightTrackMode) {
-            //获取时间段内位置列表
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                    .getBeidouMasterDeviceLocationObservable(token, id, from, to)
-                    .subscribe(new Observer<List<LocationDetail>>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            showLoadingFreightLocationError();
-                        }
-
-                        @Override
-                        public void onNext(List<LocationDetail> locationDetails) {
-                            mLocationDetailList = locationDetails;
-
-                            if (locationDetails.isEmpty()) {
-                                showNoFreightLocationData();
-                                return;
-                            }
-                            clearLocationData();
-                            showBaiduMap(locationDetails);
-                        }
-                    });
-        } else {
-            //获取最新位置点
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                    .getBeidouMasterDeviceLastLocationObservable(token, id)
-                    .subscribe(new Observer<LocationDetail>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            showLoadingFreightLocationError();
-                        }
-
-                        @Override
-                        public void onNext(LocationDetail locationDetail) {
-                            mLocationDetail = locationDetail;
-                            clearLocationData();
-                            showBaiduMap(locationDetail);
-                        }
-                    });
-        }
-    }
-
-    private void startTimePickerActivity() {
-        Intent startIntent = TimePickerActivity.getStartIntent(getContext());
-        startActivityForResult(startIntent, TimePickerActivity.REQUEST_PICK_TIME);
-        /*ActivityCompat.startActivityForResult(getActivity(),
-                startIntent,
-                TimePickerActivity.REQUEST_PICK_TIME,
-                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle());*/
-    }
-
-    private void showFreightDataListByBottomSheet(String token, String containerId, final String containerNo, List<LocationDetail> details) {
-        BottomSheetDialogView.show(getContext(), containerNo, details);
     }
 
     private void signOut(boolean isSave) {

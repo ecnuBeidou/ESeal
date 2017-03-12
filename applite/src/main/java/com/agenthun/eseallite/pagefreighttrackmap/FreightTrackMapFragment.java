@@ -1,4 +1,4 @@
-package com.agenthun.eseallite.fragment;
+package com.agenthun.eseallite.pagefreighttrackmap;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,9 +38,6 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.baidu.mapapi.utils.SpatialRelationUtil;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,7 +56,7 @@ import rx.Observer;
  * @date 2017/2/15 10:53.
  */
 
-public class FreightTrackGoogleMapFragment extends Fragment {
+public class FreightTrackMapFragment extends Fragment {
     private static final String TAG = "FreightTrackMapFragment";
 
     private static final String ARGUMENT_FREIGHT_ID = "ARGUMENT_FREIGHT_ID";
@@ -85,12 +82,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
     private Thread movingThread;
 
     MapView bmapView;
-    com.google.android.gms.maps.MapView googleMapView;
-
-    private GoogleMap mGoogleMap;
-    private com.google.android.gms.maps.model.Polyline mGoogleMapVirtureRoad;
-
-    private com.google.android.gms.maps.model.Marker mGoogleMapMoveMarker;
 
     private String mFreightId = null;
     private String mFreightName = null;
@@ -98,23 +89,23 @@ public class FreightTrackGoogleMapFragment extends Fragment {
     private LocationDetail mLocationDetail = null;
     private List<LocationDetail> mLocationDetailList = new ArrayList<>();
 
-    public static FreightTrackGoogleMapFragment newInstance(String id, String name) {
+    public static FreightTrackMapFragment newInstance(String id, String name) {
         Bundle arguments = new Bundle();
         arguments.putString(ARGUMENT_FREIGHT_ID, id);
         arguments.putString(ARGUMENT_FREIGHT_NAME, name);
-        FreightTrackGoogleMapFragment fragment = new FreightTrackGoogleMapFragment();
+        FreightTrackMapFragment fragment = new FreightTrackMapFragment();
         fragment.setArguments(arguments);
         return fragment;
     }
 
-    public FreightTrackGoogleMapFragment() {
+    public FreightTrackMapFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_freight_track_google_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_freight_track_map, container, false);
 
         mFreightId = getArguments().getString(ARGUMENT_FREIGHT_ID);
         mFreightName = getArguments().getString(ARGUMENT_FREIGHT_NAME);
@@ -123,7 +114,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
         fab.setOnClickListener(mOnFabClickListener);
 
         bmapView = (MapView) view.findViewById(R.id.bmapView);
-        googleMapView = (com.google.android.gms.maps.MapView) view.findViewById(R.id.googleMapView);
 
         mHandler = new Handler();
         return view;
@@ -132,8 +122,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setupBaiduMap();
-        setupGoogleMap();
-        googleMapView.onCreate(savedInstanceState);
         loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
         super.onViewCreated(view, savedInstanceState);
     }
@@ -142,21 +130,18 @@ public class FreightTrackGoogleMapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         bmapView.onResume();
-        googleMapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         bmapView.onPause();
-        googleMapView.onPause();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         bmapView.onDestroy();
-        googleMapView.onDestroy();
     }
 
     @Override
@@ -212,13 +197,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
     };
 
     /**
-     * 设置Google地图属性
-     */
-    private void setupGoogleMap() {
-        googleMapView.getMapAsync(mOnMapReadyCallback);
-    }
-
-    /**
      * 设置百度地图属性
      */
     private void setupBaiduMap() {
@@ -260,20 +238,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
         }
     }
 
-    private com.google.android.gms.maps.model.LatLng baiduLatLngToGoogleLatLng(LatLng baiduLatLng) {
-        double lat = baiduLatLng.latitude;
-        double lng = baiduLatLng.longitude;
-        com.google.android.gms.maps.model.LatLng googleLatLng = new com.google.android.gms.maps.model.LatLng(lat, lng);
-        return googleLatLng;
-    }
-
-    private LatLng googleLatLngToBaiduLatLng(com.google.android.gms.maps.model.LatLng googleLatLng) {
-        double lat = googleLatLng.latitude;
-        double lng = googleLatLng.longitude;
-        LatLng baiduLatLng = new LatLng(lat, lng);
-        return baiduLatLng;
-    }
-
     private List<LocationDetail> locationInfosToLocationDetailList(List<DeviceLocation> details) {
         List<LocationDetail> result = new ArrayList<LocationDetail>();
         if (details == null || details.size() == 0) return result;
@@ -304,79 +268,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
         }
 
         return result;
-    }
-
-    private OnMapReadyCallback mOnMapReadyCallback = new OnMapReadyCallback() {
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            // Instantiates a new Polyline object and adds points to define a rectangle
-            com.google.android.gms.maps.model.PolylineOptions rectOptions = new com.google.android.gms.maps.model.PolylineOptions()
-                    .add(new com.google.android.gms.maps.model.LatLng(-18.5186650000, 141.9748780000))
-                    .add(new com.google.android.gms.maps.model.LatLng(-18.5186650000, 144.9748780000))  // North of the previous point, but at the same longitude
-                    .add(new com.google.android.gms.maps.model.LatLng(-20.5186650000, 144.9748780000))  // Same latitude, and 30km to the west
-                    .add(new com.google.android.gms.maps.model.LatLng(-20.5186650000, 141.9748780000))  // Same longitude, and 16km to the south
-                    .add(new com.google.android.gms.maps.model.LatLng(-24.5186650000, 141.9748780000)); // Closes the polyline.
-
-            rectOptions.width(8)
-                    .color(ContextCompat.getColor(getActivity(), R.color.red_500));
-
-            // Get back the mutable Polyline
-            com.google.android.gms.maps.model.Polyline polyline = googleMap.addPolyline(rectOptions);
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new com.google.android.gms.maps.model.LatLng(-18.5186650000, 141.9748780000), 6));
-        }
-    };
-
-    /**
-     * 加载轨迹数据至Google地图
-     */
-    private void showGoogleMap(List<LocationDetail> locationDetails) {
-        if (locationDetails == null || locationDetails.size() == 0) return;
-
-        int countInCircle = 0;
-
-        List<com.google.android.gms.maps.model.LatLng> polylines = new ArrayList<>();
-        for (LocationDetail locationDetail :
-                locationDetails) {
-            if (locationDetail.isInvalid()) continue;
-
-            LatLng lng = locationDetail.getLatLng();
-
-            polylines.add(baiduLatLngToGoogleLatLng(lng));
-
-            if (polylines.size() > 1) {
-                if (SpatialRelationUtil.isCircleContainsPoint(googleLatLngToBaiduLatLng(polylines.get(0)), LOCATION_RADIUS, lng)) {
-                    countInCircle++;
-                }
-            }
-        }
-
-/*        Collections.reverse(polylines); //按时间正序
-
-        OverlayOptions markerOptions = null;
-
-        if (polylines.size() > 1) {
-            OverlayOptions polylineOptions = new PolylineOptions()
-                    .points(polylines)
-                    .width(8)
-                    .color(ContextCompat.getColor(getActivity(), R.color.red_500));
-
-            mVirtureRoad = (Polyline) mBaiduMap.addOverlay(polylineOptions);
-            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_car)).position(polylines.get(0)).rotate((float) getAngle(0));
-        } else {
-            markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_car)).position(polylines.get(0));
-        }
-        mMoveMarker = (Marker) mBaiduMap.addOverlay(markerOptions);
-
-        //设置中心点
-        setBaiduMapAdaptedZoom(polylines);
-        if (polylines.size() > 1 && countInCircle < polylines.size() / 2) {
-            movingThread = new Thread(new MyThread());
-            movingThread.start();
-        }*/
-
     }
 
     /**
@@ -492,32 +383,6 @@ public class FreightTrackGoogleMapFragment extends Fragment {
             }
         }
         return 16;
-    }
-
-    /**
-     * 获取Google地图显示等级
-     * 范围0-18级
-     */
-    private int getGoogleMapZoom(double minLat, double maxLat, double minLng, double maxLng) {
-        LatLng minLatLng = new LatLng(minLat, minLng);
-        LatLng maxLatLng = new LatLng(maxLat, maxLng);
-        double distance = DistanceUtil.getDistance(minLatLng, maxLatLng);
-
-        if (distance == 0.0d) {
-            return 12;
-        }
-        if (distance > 0.0d && distance <= 100.0d) {
-            return 18;
-        }
-
-        for (int i = 0; i < BAIDU_MAP_ZOOM.length; i++) {
-            if (BAIDU_MAP_ZOOM[i] - distance > 0) {
-                moveDistance = (BAIDU_MAP_ZOOM[i] - distance) / DISTANCE_RATIO;
-                Log.d(TAG, "getZoom() moveDistance = " + moveDistance);
-                return 18 - i;
-            }
-        }
-        return 12;
     }
 
     /**
@@ -650,11 +515,11 @@ public class FreightTrackGoogleMapFragment extends Fragment {
                         @Override
                         public void onNext(List<LocationDetail> locationDetails) {
                             mLocationDetailList = locationDetails;
+
                             if (locationDetails.isEmpty()) {
                                 showNoFreightLocationData();
                                 return;
                             }
-
                             clearLocationData();
                             showBaiduMap(locationDetails);
                         }

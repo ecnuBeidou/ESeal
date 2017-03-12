@@ -7,14 +7,15 @@ android {
         applicationId "com.agenthun.eseallite"
         minSdkVersion 18
         targetSdkVersion 22
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 6
+        versionName "2.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
+//        multiDexEnabled true
 
         jackOptions {
             enabled true
+            additionalParameters("jack.incremental" : "true")
         }
     }
 
@@ -117,9 +118,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:recyclerview-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:recyclerview-v7:25.1.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.2'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'

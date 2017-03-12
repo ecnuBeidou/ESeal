@@ -14,7 +14,6 @@ import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,18 +27,11 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.bean.updateByRetrofit.UpdateResponse;
 import com.agenthun.eseallite.connectivity.manager.DownloadService;
-import com.agenthun.eseallite.connectivity.manager.RetrofitManager;
-import com.agenthun.eseallite.connectivity.service.PathType;
-import com.agenthun.eseallite.pagescannfcdevice.ScanNfcDeviceContract;
 import com.agenthun.eseallite.utils.ApiLevelHelper;
 import com.agenthun.eseallite.utils.VersionHelper;
-import com.pekingopera.versionupdate.util.FileUtils;
 
 import java.io.File;
-
-import rx.Subscriber;
 
 /**
  * @project ESeal

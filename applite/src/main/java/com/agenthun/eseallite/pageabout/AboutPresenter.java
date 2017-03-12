@@ -61,6 +61,8 @@ public class AboutPresenter implements AboutContract.Presenter {
         mSubscriptions.add(RetrofitManager
                 .builder(PathType.WEB_SERVICE_V2_TEST)
                 .checkAppLiteUpdateObservable()
+                .subscribeOn(mSchedulerProvider.io())
+                .observeOn(mSchedulerProvider.ui())
                 .subscribe(new Subscriber<UpdateResponse.Entity>() {
                     @Override
                     public void onCompleted() {

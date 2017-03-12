@@ -79,7 +79,7 @@ public class NetUtil {
      * 获取所有搜索的WiFi的SSID
      */
     public static List<String> getScanWifiSSIDList(Activity activity) {
-        WifiManager wifiManager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<String> result = new ArrayList<>();
         for (ScanResult scanResult :
                 wifiManager.getScanResults()) {
@@ -92,7 +92,7 @@ public class NetUtil {
      * 获取WiFi信息
      */
     public static WifiInfo getWifiInfo(Activity activity) {
-        WifiManager wifiManager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         return wifiManager.getConnectionInfo();
     }
 

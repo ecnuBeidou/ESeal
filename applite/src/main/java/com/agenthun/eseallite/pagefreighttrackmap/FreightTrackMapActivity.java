@@ -13,15 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.agenthun.eseallite.R;
-import com.agenthun.eseallite.fragment.FreightTrackGoogleMapFragment;
-import com.agenthun.eseallite.fragment.FreightTrackMapFragment;
-import com.agenthun.eseallite.fragment.FreightTrackMapWithWebViewFragment;
 import com.agenthun.eseallite.pagescannfcdevice.ScanNfcDeviceActivity;
 import com.agenthun.eseallite.utils.ActivityUtils;
 import com.agenthun.eseallite.utils.DeviceSearchSuggestion;
+import com.agenthun.eseallite.utils.LanguageUtil;
+import com.agenthun.eseallite.utils.scheduler.SchedulerProvider;
 import com.baidu.mapapi.SDKInitializer;
-
-import butterknife.ButterKnife;
 
 /**
  * @project ESeal
@@ -107,6 +104,16 @@ public class FreightTrackMapActivity extends AppCompatActivity {
             fragment = FreightTrackMapWithWebViewFragment.newInstance(mFreight.getId(), mFreight.getName());
             ActivityUtils.replaceFragmentToActivity(supportFragmentManager, fragment, R.id.content_main);
         }
+
+        boolean mUsingWebView = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
+
+        new FreightTrackMapWithWebViewPresenter(
+                mUsingWebView,
+                mFreight.getId(),
+                mFreight.getName(),
+                getApplicationContext(),
+                fragment,
+                SchedulerProvider.getInstance());
     }
 
     @Override

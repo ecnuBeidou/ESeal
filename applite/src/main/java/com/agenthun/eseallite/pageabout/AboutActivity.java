@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 
 import com.agenthun.eseallite.R;
 import com.agenthun.eseallite.utils.ActivityUtils;
-import com.agenthun.eseallite.utils.scheduler.BaseSchedulerProvider;
 import com.agenthun.eseallite.utils.scheduler.SchedulerProvider;
 
 /**

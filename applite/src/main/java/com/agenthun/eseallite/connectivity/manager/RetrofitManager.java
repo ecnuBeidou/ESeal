@@ -302,10 +302,7 @@ public class RetrofitManager {
                         }
                         return list;
                     }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+                });
 
 /*
         //构造测试数据
@@ -357,10 +354,7 @@ public class RetrofitManager {
                         }
                         return null;
                     }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+                });
 
 /*        //构造测试数据
         return Observable
@@ -480,10 +474,7 @@ public class RetrofitManager {
                 }
                 return null;
             }
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
+        });
 
         //构造测试数据
 /*        String testDownloadUrl = "http://www.freight-track.com/files/ESeal_Lite_v_1_0_3_2017-02-25.apk";
