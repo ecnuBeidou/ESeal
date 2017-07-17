@@ -256,6 +256,8 @@ public class DownloadService extends Service {
         RetrofitManager.builder(mContext, PathType.WEB_SERVICE_V2_TEST)
                 .downloadFileObservable(url)
                 .subscribe(new DownloadSubscriber<ResponseBody>(mContext, fileName, new DownloadCallBack() {
+                    int progressTemp = 0;
+
                     @Override
                     public void onStart() {
                         downloading = true;
@@ -278,7 +280,10 @@ public class DownloadService extends Service {
                     public void onProgress(long current, long total) {
                         Log.d(TAG, "downloaded: " + current + "/" + total);
                         int percent = (int) (current * 100.0f / total);
-                        showProgressDownloadNotificationCompat(percent);
+                        if (progressTemp != percent) {
+                            showProgressDownloadNotificationCompat(percent);
+                        }
+                        progressTemp = percent;
                     }
 
                     @Override
@@ -298,6 +303,7 @@ public class DownloadService extends Service {
                                 });
 
                         showDownloadFileSuccess(path, name);
+                        processInstallApk(mContext, path);
                         downloading = false;
                     }
 

@@ -45,6 +45,7 @@ import com.agenthun.eseal.utils.ApiLevelHelper;
 import com.agenthun.eseal.utils.LanguageUtil;
 import com.agenthun.eseal.utils.LocationHelper;
 import com.agenthun.eseal.utils.NetUtil;
+import com.agenthun.eseal.utils.TimeZoneUtil;
 import com.agenthun.eseal.utils.baidumap.LocationService;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -513,7 +514,7 @@ public class NfcDeviceFragment extends Fragment {
     private void serviceOerationSetting(SettingType settingType, String coordinate, String imageResourceStr) {
         String token = App.getToken();
         if (token != null) {
-            String operateTime = DATE_FORMAT.format(Calendar.getInstance().getTime());
+            String operateTime = TimeZoneUtil.getLocal2UtcTime();
 
             RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
                     .configureDeviceObservable(token, Api.DEVICE_TYPE_BEIDOU_NFC, "",
@@ -547,6 +548,8 @@ public class NfcDeviceFragment extends Fragment {
         if (token != null) {
             String imgUrl = getImageResourceBase64(lockPicturePreview);
             String operateTime = lockTime.getText().toString();
+            operateTime = TimeZoneUtil.local2Utc(operateTime, "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
             String coordinate = "0.000000,0.000000";
             if (!TextUtils.equals(lockLocation.getText(), getString(R.string.text_hint_get_current_location))) {
                 coordinate = lockLocation.getText().toString().split(", ")[1];
@@ -583,6 +586,8 @@ public class NfcDeviceFragment extends Fragment {
         if (token != null) {
             String imgUrl = getImageResourceBase64(unlockPicturePreview);
             String operateTime = unlockTime.getText().toString();
+            operateTime = TimeZoneUtil.local2Utc(operateTime, "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+            
             String coordinate = "0.000000,0.000000";
             if (!TextUtils.equals(unlockLocation.getText(), getString(R.string.text_hint_get_current_location))) {
                 coordinate = unlockLocation.getText().toString().split(", ")[1];

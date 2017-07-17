@@ -61,6 +61,5 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 art/art.mp4
-art/readFileSize.sh
 art/*.apk
-art/*.json
+art/apk

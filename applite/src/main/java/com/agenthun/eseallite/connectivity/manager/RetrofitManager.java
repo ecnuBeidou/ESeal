@@ -484,10 +484,7 @@ public class RetrofitManager {
                         testDownloadUrl,
                         100,
                         "x.0.x"))
-                .delay(100, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());*/
+                .delay(100, TimeUnit.MILLISECONDS);*/
     }
 
     /**
