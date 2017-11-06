@@ -33,7 +33,7 @@ import com.agenthun.eseal.view.CheckableFab;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -47,40 +47,40 @@ public class DeviceSettingActivity extends AppCompatActivity {
     public static final String RESULT_CONFIGURE = "result_configure";
     public static final String IS_CONFIG_BLE_DEVICE = "IS_CONFIG_BLE_DEVICE";
 
-    @Bind(R.id.nfc_layout)
+    @BindView(R.id.nfc_layout)
     View nfcLayout;
 
-    @Bind(R.id.frequency_layout)
+    @BindView(R.id.frequency_layout)
     View frequencyLayout;
 
-    @Bind(R.id.nfc_id)
+    @BindView(R.id.nfc_id)
     AppCompatEditText nfcId;
 
-    @Bind(R.id.container_number)
+    @BindView(R.id.container_number)
     AppCompatEditText containerNumber;
 
-    @Bind(R.id.owner)
+    @BindView(R.id.owner)
     AppCompatEditText owner;
 
-    @Bind(R.id.freight_name)
+    @BindView(R.id.freight_name)
     AppCompatEditText freightName;
 
-    @Bind(R.id.origin)
+    @BindView(R.id.origin)
     AppCompatEditText origin;
 
-    @Bind(R.id.destination)
+    @BindView(R.id.destination)
     AppCompatEditText destination;
 
-    @Bind(R.id.vessel)
+    @BindView(R.id.vessel)
     AppCompatEditText vessel;
 
-    @Bind(R.id.voyage)
+    @BindView(R.id.voyage)
     AppCompatEditText voyage;
 
-    @Bind(R.id.frequency)
+    @BindView(R.id.frequency)
     AppCompatEditText frequency;
 
-    @Bind(R.id.fab)
+    @BindView(R.id.fab)
     CheckableFab fab;
 
     private Handler mHandler = new Handler();

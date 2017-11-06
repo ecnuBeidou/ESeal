@@ -67,7 +67,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.functions.Action1;
@@ -99,22 +99,22 @@ public class NfcDeviceFragment extends Fragment {
 
     String coordinateSetting = "0.000000,0.000000";
 
-    @Bind(R.id.folding_cell_lock)
+    @BindView(R.id.folding_cell_lock)
     FoldingCell foldingCellLock;
 
-    @Bind(R.id.cell_content_lock)
+    @BindView(R.id.cell_content_lock)
     View cellContentLockView;
 
-    @Bind(R.id.cell_title_lock)
+    @BindView(R.id.cell_title_lock)
     View cellTitleLockView;
 
-    @Bind(R.id.folding_cell_unlock)
+    @BindView(R.id.folding_cell_unlock)
     FoldingCell foldingCellUnlock;
 
-    @Bind(R.id.cell_content_unlock)
+    @BindView(R.id.cell_content_unlock)
     View cellContentUnlockView;
 
-    @Bind(R.id.cell_title_unlock)
+    @BindView(R.id.cell_title_unlock)
     View cellTitleUnlockView;
 
     private View lockAddDevicePicture;

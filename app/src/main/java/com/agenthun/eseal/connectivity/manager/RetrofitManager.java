@@ -70,7 +70,8 @@ public class RetrofitManager {
     public RetrofitManager(PathType pathType) {
         if (freightTrackWebService == null) {
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getPath(pathType))
+//                    .baseUrl(getPath(pathType))
+                    .baseUrl(getPath(PathType.WEB_SERVICE_V2_RELEASE))
                     .addConverterFactory(XMLGsonConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -83,7 +84,8 @@ public class RetrofitManager {
         mContext = context;
         initOkHttpClient();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getPath(pathType))
+//                .baseUrl(getPath(pathType))
+                .baseUrl(getPath(PathType.WEB_SERVICE_V2_RELEASE))
                 .client(mOkHttpClient)
                 .addConverterFactory(XMLGsonConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -298,11 +300,28 @@ public class RetrofitManager {
 //                        converter.coord(latLng);
 //                        latLng = converter.convert();
 
+                                String temperatureString = deviceLocation.getTemperature();
+                                Float temperature = Float.parseFloat(temperatureString);
+
+                                String humidityString = deviceLocation.getHumidity();
+                                Float humidity = Float.parseFloat(humidityString);
+
+                                String vibrationString[] = deviceLocation.getVibration().split(",");
+                                Float vibarationX = Float.parseFloat(vibrationString[0]);
+                                Float vibarationY = Float.parseFloat(vibrationString[1]);
+                                Float vibarationZ = Float.parseFloat(vibrationString[2]);
+
                                 LocationDetail d = new LocationDetail(reportTime,
                                         uploadType,
                                         securityLevel,
                                         closedFlag,
-                                        latLng);
+                                        latLng,
+                                        temperature,
+                                        humidity,
+                                        vibarationX,
+                                        vibarationY,
+                                        vibarationZ);
+
                                 list.add(d);
                             }
                         }
@@ -353,11 +372,33 @@ public class RetrofitManager {
 //                    converter.coord(latLng);
 //                    latLng = converter.convert();
 
+//                            LocationDetail d = new LocationDetail(reportTime,
+//                                    uploadType,
+//                                    securityLevel,
+//                                    closedFlag,
+//                                    latLng);
+
+                            String temperatureString = deviceLocation.getTemperature();
+                            Float temperature = Float.parseFloat(temperatureString);
+
+                            String humidityString = deviceLocation.getHumidity();
+                            Float humidity = Float.parseFloat(humidityString);
+
+                            String vibrationString[] = deviceLocation.getVibration().split(",");
+                            Float vibarationX = Float.parseFloat(vibrationString[0]);
+                            Float vibarationY = Float.parseFloat(vibrationString[1]);
+                            Float vibarationZ = Float.parseFloat(vibrationString[2]);
+
                             LocationDetail d = new LocationDetail(reportTime,
                                     uploadType,
                                     securityLevel,
                                     closedFlag,
-                                    latLng);
+                                    latLng,
+                                    temperature,
+                                    humidity,
+                                    vibarationX,
+                                    vibarationY,
+                                    vibarationZ);
 
                             return d;
                         }

@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -91,11 +91,13 @@ public class FreightTrackBaiduMapFragment extends Fragment {
     private double moveDistance = 0.0001;
     private Thread movingThread;
 
-    @Bind(R.id.bmapView)
+    @BindView(R.id.bmapView)
     MapView bmapView;
-    @Bind(R.id.webView)
+
+    @BindView(R.id.webView)
     WebView webView;
-    @Bind(R.id.blurredMap)
+
+    @BindView(R.id.blurredMap)
     ImageView blurredMap;
 
     private FloatingSearchView floatingSearchView;
@@ -510,7 +512,20 @@ public class FreightTrackBaiduMapFragment extends Fragment {
             );
 //            converter.coord(lng);
 //            lng = converter.convert();
-            result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng));
+
+            String temperatureString = detail.getTemperature();
+            Float temperature = Float.parseFloat(temperatureString);
+
+            String humidityString = detail.getHumidity();
+            Float humidity = Float.parseFloat(humidityString);
+
+            String vibrationString[] = detail.getVibration().split(",");
+            Float vibarationX = Float.parseFloat(vibrationString[0]);
+            Float vibarationY = Float.parseFloat(vibrationString[1]);
+            Float vibarationZ = Float.parseFloat(vibrationString[2]);
+
+//            result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng));
+            result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng, temperature, humidity, vibarationX, vibarationY, vibarationZ));
         }
 
         return result;

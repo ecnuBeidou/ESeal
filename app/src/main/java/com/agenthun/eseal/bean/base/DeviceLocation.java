@@ -15,13 +15,20 @@ public class DeviceLocation implements Parcelable {
     private String SecurityLevel;
     private String ClosedFlag;
     private String BaiduCoordinate;
+    private String Temperature;
+    private String Humidity;
+    private String Vibration;
 
-    public DeviceLocation(String reportTime, String uploadType, String securityLevel, String closedFlag, String baiduCoordinate) {
+    public DeviceLocation(String reportTime, String uploadType, String securityLevel, String closedFlag, String baiduCoordinate,
+                          String temperature, String humidity, String vibration) {
         ReportTime = reportTime;
         UploadType = uploadType;
         SecurityLevel = securityLevel;
         ClosedFlag = closedFlag;
         BaiduCoordinate = baiduCoordinate;
+        Temperature = temperature;
+        Humidity = humidity;
+        Vibration = vibration;
     }
 
     public String getReportTime() {
@@ -64,6 +71,30 @@ public class DeviceLocation implements Parcelable {
         BaiduCoordinate = baiduCoordinate;
     }
 
+    public String getTemperature() {
+        return Temperature;
+    }
+
+    public void setTemperature(String temperature) {
+        Temperature = temperature;
+    }
+
+    public String getHumidity() {
+        return Humidity;
+    }
+
+    public void setHumidity(String humidity) {
+        Humidity = humidity;
+    }
+
+    public String getVibration() {
+        return Vibration;
+    }
+
+    public void setVibration(String vibration) {
+        Vibration = vibration;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -76,6 +107,9 @@ public class DeviceLocation implements Parcelable {
         dest.writeString(this.SecurityLevel);
         dest.writeString(this.ClosedFlag);
         dest.writeString(this.BaiduCoordinate);
+        dest.writeString(this.Temperature);
+        dest.writeString(this.Humidity);
+        dest.writeString(this.Vibration);
     }
 
     protected DeviceLocation(Parcel in) {
@@ -84,6 +118,9 @@ public class DeviceLocation implements Parcelable {
         this.SecurityLevel = in.readString();
         this.ClosedFlag = in.readString();
         this.BaiduCoordinate = in.readString();
+        this.Temperature = in.readString();
+        this.Humidity = in.readString();
+        this.Vibration = in.readString();
     }
 
     public static final Parcelable.Creator<DeviceLocation> CREATOR = new Parcelable.Creator<DeviceLocation>() {
@@ -127,6 +164,9 @@ public class DeviceLocation implements Parcelable {
                 ", SecurityLevel='" + SecurityLevel + '\'' +
                 ", ClosedFlag='" + ClosedFlag + '\'' +
                 ", BaiduCoordinate='" + BaiduCoordinate + '\'' +
+                ", Temperature='" + Temperature + '\'' +
+                ", Humidity='" + Humidity + '\'' +
+                ", Vibration='" + Vibration + '\'' +
                 '}';
     }
 

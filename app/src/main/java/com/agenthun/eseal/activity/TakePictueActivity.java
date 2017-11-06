@@ -37,7 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -56,13 +56,13 @@ public class TakePictueActivity extends AppCompatActivity implements CameraHostP
     private File mFile;
     private int currentState;
 
-    @Bind(R.id.cameraView)
+    @BindView(R.id.cameraView)
     CameraView cameraView;
-    @Bind(R.id.picturePreview)
+    @BindView(R.id.picturePreview)
     ImageView picturePreview;
-    @Bind(R.id.control)
+    @BindView(R.id.control)
     ViewSwitcher controlPanel;
-    @Bind(R.id.takePictureBtn)
+    @BindView(R.id.takePictureBtn)
     AppCompatButton takePictureBtn;
 
     public static void start(Activity activity, int[] startLocation, ActivityOptionsCompat options) {

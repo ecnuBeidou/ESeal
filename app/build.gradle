@@ -12,7 +12,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = false } }
+//        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = false } }
 
 //        multiDexEnabled true
 
@@ -140,7 +140,12 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'io.reactivex:rxjava:1.2.2'
     compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.jakewharton:butterknife:7.0.1'
+
+//    compile 'com.jakewharton:butterknife:7.0.1'
+
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
     compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
     compile 'com.commonsware.cwac:camera:0.6.+'

@@ -38,7 +38,7 @@ import com.pekingopera.versionupdate.util.FileUtils;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscriber;
@@ -56,23 +56,23 @@ public class AboutFragment extends Fragment {
 
     Toolbar toolbar;
 
-    @Bind(R.id.about_content)
+    @BindView(R.id.about_content)
     View aboutContent;
-    @Bind(R.id.web_content)
+    @BindView(R.id.web_content)
     View webContent;
-    @Bind(R.id.webView)
+    @BindView(R.id.webView)
     WebView webView;
-    @Bind(R.id.progress)
+    @BindView(R.id.progress)
     ContentLoadingProgressBar progressBar;
-    @Bind(R.id.web_error_content)
+    @BindView(R.id.web_error_content)
     View webErrorContent;
 
-    @Bind(R.id.app_version_name)
+    @BindView(R.id.app_version_name)
     AppCompatTextView appVersionName;
 
-    @Bind(R.id.app_new_version_hint)
+    @BindView(R.id.app_new_version_hint)
     AppCompatTextView appNewVersionHint;
-    @Bind(R.id.app_new_version_name)
+    @BindView(R.id.app_new_version_name)
     AppCompatTextView appNewVersionName;
 
     public static AboutFragment newInstance() {

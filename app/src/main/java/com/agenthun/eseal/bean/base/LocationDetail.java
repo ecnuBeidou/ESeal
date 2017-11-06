@@ -17,16 +17,27 @@ public class LocationDetail implements Parcelable {
     private String securityLevel;
     private String closedFlag;
     private LatLng latLng;
+    private Float temperature;
+    private Float humidity;
+    private Float vibrationX;
+    private Float vibrationY;
+    private Float vibrationZ;
 
     public LocationDetail() {
     }
 
-    public LocationDetail(String reportTime, String uploadType, String securityLevel, String closedFlag, LatLng latLng) {
+    public LocationDetail(String reportTime, String uploadType, String securityLevel, String closedFlag, LatLng latLng,
+                          Float temperature, Float humidity, Float vibrationX, Float vibrationY, Float vibrationZ) {
         this.reportTime = reportTime;
         this.uploadType = uploadType;
         this.securityLevel = securityLevel;
         this.closedFlag = closedFlag;
         this.latLng = latLng;
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.vibrationX = vibrationX;
+        this.vibrationY = vibrationY;
+        this.vibrationZ = vibrationZ;
     }
 
     public String getReportTime() {
@@ -69,6 +80,46 @@ public class LocationDetail implements Parcelable {
         this.latLng = latLng;
     }
 
+    public Float getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(Float temperature) {
+        this.temperature = temperature;
+    }
+
+    public Float getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(Float humidity) {
+        this.humidity = humidity;
+    }
+
+    public Float getVibrationX() {
+        return vibrationX;
+    }
+
+    public void setVibrationX(Float vibrationX) {
+        this.vibrationX = vibrationX;
+    }
+
+    public Float getVibrationY() {
+        return vibrationY;
+    }
+
+    public void setVibrationY(Float vibrationY) {
+        this.vibrationY = vibrationY;
+    }
+
+    public Float getVibrationZ() {
+        return vibrationZ;
+    }
+
+    public void setVibrationZ(Float vibrationZ) {
+        this.vibrationZ = vibrationZ;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -81,6 +132,11 @@ public class LocationDetail implements Parcelable {
         dest.writeString(this.securityLevel);
         dest.writeString(this.closedFlag);
         dest.writeParcelable(this.latLng, flags);
+        dest.writeFloat(this.temperature);
+        dest.writeFloat(this.humidity);
+        dest.writeFloat(this.vibrationX);
+        dest.writeFloat(this.vibrationY);
+        dest.writeFloat(this.vibrationZ);
     }
 
     protected LocationDetail(Parcel in) {
@@ -89,6 +145,11 @@ public class LocationDetail implements Parcelable {
         this.securityLevel = in.readString();
         this.closedFlag = in.readString();
         this.latLng = in.readParcelable(LatLng.class.getClassLoader());
+        this.temperature = in.readFloat();
+        this.humidity = in.readFloat();
+        this.vibrationX = in.readFloat();
+        this.vibrationY = in.readFloat();
+        this.vibrationZ = in.readFloat();
     }
 
     public static final Parcelable.Creator<LocationDetail> CREATOR = new Parcelable.Creator<LocationDetail>() {
@@ -130,6 +191,11 @@ public class LocationDetail implements Parcelable {
                 ", securityLevel='" + securityLevel + '\'' +
                 ", closedFlag='" + closedFlag + '\'' +
                 ", latLng=" + latLng +
+                ", temperature=" + temperature +
+                ", humidity=" + humidity +
+                ", vibrationX=" + vibrationX +
+                ", vibrationY=" + vibrationY +
+                ", vibrationZ=" + vibrationZ +
                 '}';
     }
 
