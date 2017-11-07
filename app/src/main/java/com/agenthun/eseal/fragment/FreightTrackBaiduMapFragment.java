@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -513,16 +514,41 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 //            converter.coord(lng);
 //            lng = converter.convert();
 
-            String temperatureString = detail.getTemperature();
-            Float temperature = Float.parseFloat(temperatureString);
+            Float temperature;
+            try {
+//                temperature = Float.parseFloat(detail.getTemperature());
+                temperature = Float.valueOf(Math.abs((new Random()).nextInt() % 100));
+            }
+            catch (Exception ex) {
+                temperature = 0f;
+            }
 
-            String humidityString = detail.getHumidity();
-            Float humidity = Float.parseFloat(humidityString);
+            Float humidity;
+            try {
+//                humidity = Float.parseFloat(detail.getHumidity());
+                humidity = Float.valueOf(Math.abs((new Random()).nextInt() % 50));
+            }
+            catch (Exception ex) {
+                humidity = 0f;
+            }
 
-            String vibrationString[] = detail.getVibration().split(",");
-            Float vibarationX = Float.parseFloat(vibrationString[0]);
-            Float vibarationY = Float.parseFloat(vibrationString[1]);
-            Float vibarationZ = Float.parseFloat(vibrationString[2]);
+            Float vibarationX;
+            Float vibarationY;
+            Float vibarationZ;
+            try {
+//                String vibrationString[] = detail.getVibration().split(",");
+//                vibarationX = Float.parseFloat(vibrationString[0]);
+//                vibarationY = Float.parseFloat(vibrationString[1]);
+//                vibarationZ = Float.parseFloat(vibrationString[2]);
+                vibarationX = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+                vibarationY = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+                vibarationZ = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+            }
+            catch (Exception ex) {
+                vibarationX = 0f;
+                vibarationY = 0f;
+                vibarationZ = 0f;
+            }
 
 //            result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng));
             result.add(new LocationDetail(time, uploadType, securityLevel, closedFlag, lng, temperature, humidity, vibarationX, vibarationY, vibarationZ));

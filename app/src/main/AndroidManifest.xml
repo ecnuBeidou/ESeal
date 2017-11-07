@@ -106,6 +106,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.TextAppearance" />
 
+        <activity android:name=".activity.ListViewLineChartActivity"></activity>
+
         <service android:name=".connectivity.manager.DownloadService" />
 
         <!--百度地图API-->

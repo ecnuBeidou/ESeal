@@ -300,16 +300,36 @@ public class RetrofitManager {
 //                        converter.coord(latLng);
 //                        latLng = converter.convert();
 
-                                String temperatureString = deviceLocation.getTemperature();
-                                Float temperature = Float.parseFloat(temperatureString);
+                                Float temperature;
+                                try {
+                                    temperature = Float.parseFloat(deviceLocation.getTemperature());
+                                }
+                                catch (Exception ex) {
+                                    temperature = 0f;
+                                }
 
-                                String humidityString = deviceLocation.getHumidity();
-                                Float humidity = Float.parseFloat(humidityString);
+                                Float humidity;
+                                try {
+                                    humidity = Float.parseFloat(deviceLocation.getHumidity());
+                                }
+                                catch (Exception ex) {
+                                    humidity = 0f;
+                                }
 
-                                String vibrationString[] = deviceLocation.getVibration().split(",");
-                                Float vibarationX = Float.parseFloat(vibrationString[0]);
-                                Float vibarationY = Float.parseFloat(vibrationString[1]);
-                                Float vibarationZ = Float.parseFloat(vibrationString[2]);
+                                Float vibarationX;
+                                Float vibarationY;
+                                Float vibarationZ;
+                                try {
+                                    String vibrationString[] = deviceLocation.getVibration().split(",");
+                                    vibarationX = Float.parseFloat(vibrationString[0]);
+                                    vibarationY = Float.parseFloat(vibrationString[1]);
+                                    vibarationZ = Float.parseFloat(vibrationString[2]);
+                                }
+                                catch (Exception ex) {
+                                    vibarationX = 0f;
+                                    vibarationY = 0f;
+                                    vibarationZ = 0f;
+                                }
 
                                 LocationDetail d = new LocationDetail(reportTime,
                                         uploadType,
@@ -378,16 +398,36 @@ public class RetrofitManager {
 //                                    closedFlag,
 //                                    latLng);
 
-                            String temperatureString = deviceLocation.getTemperature();
-                            Float temperature = Float.parseFloat(temperatureString);
+                            Float temperature;
+                            try {
+                                temperature = Float.parseFloat(deviceLocation.getTemperature());
+                            }
+                            catch (Exception ex) {
+                                temperature = 0f;
+                            }
 
-                            String humidityString = deviceLocation.getHumidity();
-                            Float humidity = Float.parseFloat(humidityString);
+                            Float humidity;
+                            try {
+                                humidity = Float.parseFloat(deviceLocation.getHumidity());
+                            }
+                            catch (Exception ex) {
+                                humidity = 0f;
+                            }
 
-                            String vibrationString[] = deviceLocation.getVibration().split(",");
-                            Float vibarationX = Float.parseFloat(vibrationString[0]);
-                            Float vibarationY = Float.parseFloat(vibrationString[1]);
-                            Float vibarationZ = Float.parseFloat(vibrationString[2]);
+                            Float vibarationX;
+                            Float vibarationY;
+                            Float vibarationZ;
+                            try {
+                                String vibrationString[] = deviceLocation.getVibration().split(",");
+                                vibarationX = Float.parseFloat(vibrationString[0]);
+                                vibarationY = Float.parseFloat(vibrationString[1]);
+                                vibarationZ = Float.parseFloat(vibrationString[2]);
+                            }
+                            catch (Exception ex) {
+                                vibarationX = 0f;
+                                vibarationY = 0f;
+                                vibarationZ = 0f;
+                            }
 
                             LocationDetail d = new LocationDetail(reportTime,
                                     uploadType,

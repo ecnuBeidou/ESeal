@@ -1,5 +1,6 @@
 package com.agenthun.eseal.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import com.agenthun.eseal.bean.base.LocationDetail;
 import com.agenthun.eseal.connectivity.manager.RetrofitManager;
 import com.agenthun.eseal.utils.ApiLevelHelper;
 import com.agenthun.eseal.utils.PreferencesHelper;
+import com.agenthun.eseal.view.BottomSheetDialogTemperatureView;
 import com.agenthun.eseal.view.BottomSheetDialogView;
 import com.pekingopera.versionupdate.UpdateHelper;
 import com.pekingopera.versionupdate.listener.ForceListener;
@@ -44,11 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private FloatingActionButton fab;
+    private FloatingActionButton fab2;
 
     private String token = null;
     private String mContainerNo = null;
     private String mContainerId = null;
-    private List<LocationDetail> mDetails = new ArrayList<>();
+    private ArrayList<LocationDetail> mDetails = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 Log.d(TAG, "onPageSelected() returned: " + position);
+
+                fab2.setVisibility(View.GONE);
+
                 if (position == 0) {
                     fab.setVisibility(View.VISIBLE);
                     ViewCompat.animate(fab).scaleX(1).scaleY(1)
@@ -134,12 +140,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab2.setVisibility(View.GONE);
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mContainerNo != null && mContainerId != null) {
+                    showTemperaturesByBottomSheet(mContainerNo, mDetails);
+                } else {
+                    Snackbar snackbar = Snackbar.make(v, getString(R.string.text_hint_freight_query), Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null);
+                    ((TextView) (snackbar.getView().findViewById(R.id.snackbar_text))).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue_grey_100));
+                    snackbar.show();
+                }
+            }
+        });
+
         mSectionsPagerAdapter.setOnDataChangeListener(new SectionsPagerAdapter.OnDataChangeListener() {
             @Override
             public void onContainerDataChange(String containerNo, String containerId, List<LocationDetail> details) {
                 mContainerNo = containerNo;
                 mContainerId = containerId;
-                mDetails = details;
+                mDetails = (ArrayList<LocationDetail>) details;
+
+                if (mContainerNo != null && mContainerId != null) {
+                    fab2.setVisibility(View.VISIBLE);
+                }
+                else {
+                    fab2.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -224,6 +254,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void showFreightDataListByBottomSheet(String token, String containerId, final String containerNo, List<LocationDetail> details) {
         BottomSheetDialogView.show(MainActivity.this, containerNo, details);
+    }
+
+    private void showTemperaturesByBottomSheet(final String containerNo, ArrayList<LocationDetail> details) {
+//        BottomSheetDialogTemperatureView.show(MainActivity.this, containerNo, details);
+
+        Intent i = ListViewLineChartActivity.newIntent(MainActivity.this, details);
+        startActivity(i);
     }
 
     private void checkUpdate() {

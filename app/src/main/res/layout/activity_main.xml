@@ -44,5 +44,13 @@
         android:src="@drawable/ic_expand_less_black_24dp"
         android:tint="@color/white" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_thermometer"
+        app:backgroundTint="@color/white" />
 
 </android.support.design.widget.CoordinatorLayout>
