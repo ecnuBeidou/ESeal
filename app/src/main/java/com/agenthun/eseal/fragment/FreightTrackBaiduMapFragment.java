@@ -140,7 +140,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
         if (token != null) {
             suggestionList.clear();
             //获取所有设备货物信息
-            RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
+            RetrofitManager.builder(getActivity(), PathType.WEB_SERVICE_V2_TEST)
                     .getAllDeviceFreightListObservable(token)
                     .subscribe(new Subscriber<List<DeviceSearchSuggestion>>() {
                         @Override
@@ -150,7 +150,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
-                            Log.d(TAG, "onError: getAllDeviceFreightListObservable()");
+                            Log.d(TAG, "onError: getAllDeviceFreightListObservable()" + e.toString());
                         }
 
                         @Override
@@ -516,8 +516,8 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
             Float temperature;
             try {
-//                temperature = Float.parseFloat(detail.getTemperature());
-                temperature = Float.valueOf(Math.abs((new Random()).nextInt() % 100));
+//                temperature = Float.valueOf(Math.abs((new Random()).nextInt() % 100));
+                temperature = Float.parseFloat(detail.getTemperature());
             }
             catch (Exception ex) {
                 temperature = 0f;
@@ -525,8 +525,8 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
             Float humidity;
             try {
-//                humidity = Float.parseFloat(detail.getHumidity());
-                humidity = Float.valueOf(Math.abs((new Random()).nextInt() % 50));
+//                humidity = Float.valueOf(Math.abs((new Random()).nextInt() % 50));
+                humidity = Float.parseFloat(detail.getHumidity());
             }
             catch (Exception ex) {
                 humidity = 0f;
@@ -536,13 +536,14 @@ public class FreightTrackBaiduMapFragment extends Fragment {
             Float vibarationY;
             Float vibarationZ;
             try {
-//                String vibrationString[] = detail.getVibration().split(",");
-//                vibarationX = Float.parseFloat(vibrationString[0]);
-//                vibarationY = Float.parseFloat(vibrationString[1]);
-//                vibarationZ = Float.parseFloat(vibrationString[2]);
-                vibarationX = (Math.abs((new Random()).nextInt() % 10)) / 10f;
-                vibarationY = (Math.abs((new Random()).nextInt() % 10)) / 10f;
-                vibarationZ = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+//                vibarationX = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+//                vibarationY = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+//                vibarationZ = (Math.abs((new Random()).nextInt() % 10)) / 10f;
+
+                String vibrationString[] = detail.getVibration().split(",");
+                vibarationX = Float.parseFloat(vibrationString[0]);
+                vibarationY = Float.parseFloat(vibrationString[1]);
+                vibarationZ = Float.parseFloat(vibrationString[2]);
             }
             catch (Exception ex) {
                 vibarationX = 0f;

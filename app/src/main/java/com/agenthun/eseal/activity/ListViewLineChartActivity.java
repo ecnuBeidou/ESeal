@@ -67,7 +67,9 @@ public class ListViewLineChartActivity extends FragmentActivity {
         // Real data
         list.add(getTemperatureData(details));
         list.add(getHumidityData(details));
-        list.add(getVibrationData(details));
+        list.add(getVibrationXData(details));
+        list.add(getVibrationYData(details));
+        list.add(getVibrationZData(details));
 
         return list;
     }
@@ -80,7 +82,7 @@ public class ListViewLineChartActivity extends FragmentActivity {
         }
 
         LineDataSet lineDataSet = new LineDataSet(entries, "温度");
-        lineDataSet.setLineWidth(2.5f);
+        lineDataSet.setLineWidth(1f);
         lineDataSet.setCircleRadius(4.5f);
         lineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         lineDataSet.setDrawValues(false);
@@ -100,7 +102,7 @@ public class ListViewLineChartActivity extends FragmentActivity {
         }
 
         LineDataSet lineDataSet = new LineDataSet(entries, "湿度");
-        lineDataSet.setLineWidth(2.5f);
+        lineDataSet.setLineWidth(1f);
         lineDataSet.setCircleRadius(4.5f);
         lineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         lineDataSet.setColor(Color.rgb(255, 208, 140));
@@ -114,35 +116,59 @@ public class ListViewLineChartActivity extends FragmentActivity {
         return cd;
     }
 
-    private LineData getVibrationData(ArrayList<LocationDetail> details) {
+    private LineData getVibrationXData(ArrayList<LocationDetail> details) {
         ArrayList<Entry> xEntries = new ArrayList<Entry>();
-        ArrayList<Entry> yEntries = new ArrayList<Entry>();
-        ArrayList<Entry> zEntries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
             xEntries.add(new Entry(i, details.get(i).getVibrationX()));
-            yEntries.add(new Entry(i, details.get(i).getVibrationY()));
-            zEntries.add(new Entry(i, details.get(i).getVibrationZ()));
         }
 
         LineDataSet xLineDataSet = new LineDataSet(xEntries, "振动X");
-        xLineDataSet.setLineWidth(2.5f);
+        xLineDataSet.setLineWidth(1f);
         xLineDataSet.setCircleRadius(4.5f);
         xLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         xLineDataSet.setColor(Color.rgb(255, 247, 140));
         xLineDataSet.setCircleColor(Color.rgb(255, 247, 140));
         xLineDataSet.setDrawValues(false);
 
+        ArrayList<ILineDataSet> iLineDataSets = new ArrayList<ILineDataSet>();
+        iLineDataSets.add(xLineDataSet);
+
+        LineData cd = new LineData(iLineDataSets);
+        return cd;
+    }
+
+    private LineData getVibrationYData(ArrayList<LocationDetail> details) {
+        ArrayList<Entry> yEntries = new ArrayList<Entry>();
+
+        for(int i = 0; i < details.size(); i++) {
+            yEntries.add(new Entry(i, details.get(i).getVibrationY()));
+        }
+
         LineDataSet yLineDataSet = new LineDataSet(yEntries, "振动Y");
-        yLineDataSet.setLineWidth(2.5f);
+        yLineDataSet.setLineWidth(1f);
         yLineDataSet.setCircleRadius(4.5f);
         yLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         yLineDataSet.setColor(Color.rgb(192, 255, 140));
         yLineDataSet.setCircleColor(Color.rgb(192, 255, 140));
         yLineDataSet.setDrawValues(false);
 
+        ArrayList<ILineDataSet> iLineDataSets = new ArrayList<ILineDataSet>();
+        iLineDataSets.add(yLineDataSet);
+
+        LineData cd = new LineData(iLineDataSets);
+        return cd;
+    }
+
+    private LineData getVibrationZData(ArrayList<LocationDetail> details) {
+        ArrayList<Entry> zEntries = new ArrayList<Entry>();
+
+        for(int i = 0; i < details.size(); i++) {
+            zEntries.add(new Entry(i, details.get(i).getVibrationZ()));
+        }
+
         LineDataSet zLineDataSet = new LineDataSet(zEntries, "振动Z");
-        zLineDataSet.setLineWidth(2.5f);
+        zLineDataSet.setLineWidth(1f);
         zLineDataSet.setCircleRadius(4.5f);
         zLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         zLineDataSet.setColor(Color.rgb(193, 37, 82));
@@ -150,8 +176,6 @@ public class ListViewLineChartActivity extends FragmentActivity {
         zLineDataSet.setDrawValues(false);
 
         ArrayList<ILineDataSet> iLineDataSets = new ArrayList<ILineDataSet>();
-        iLineDataSets.add(xLineDataSet);
-        iLineDataSets.add(yLineDataSet);
         iLineDataSets.add(zLineDataSet);
 
         LineData cd = new LineData(iLineDataSets);
@@ -185,10 +209,10 @@ public class ListViewLineChartActivity extends FragmentActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            if (!holder.chart.isEmpty()) {
-                holder.chart.clearValues();
-            }
-            holder.chart.clear();
+//            if (!holder.chart.isEmpty()) {
+//                holder.chart.clearValues();
+//            }
+//            holder.chart.clear();
 
             // apply styling
             // holder.chart.setValueTypeface(mTf);

@@ -113,8 +113,8 @@ public class RetrofitManager {
                 .cache(cache)
                 .addInterceptor(new CacheInterceptor(mContext))
                 .addNetworkInterceptor(new CacheInterceptor(mContext))
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(300, TimeUnit.SECONDS)
+                .writeTimeout(300, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool(5, 10, TimeUnit.SECONDS))
                 .build();
     }
