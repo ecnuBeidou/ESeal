@@ -71,7 +71,7 @@ public class RetrofitManager {
         if (freightTrackWebService == null) {
             Retrofit retrofit = new Retrofit.Builder()
 //                    .baseUrl(getPath(pathType))
-                    .baseUrl(getPath(PathType.WEB_SERVICE_V2_RELEASE))
+                    .baseUrl(getPath(PathType.WEB_SERVICE_V2_TEST))
                     .addConverterFactory(XMLGsonConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -85,7 +85,7 @@ public class RetrofitManager {
         initOkHttpClient();
         Retrofit retrofit = new Retrofit.Builder()
 //                .baseUrl(getPath(pathType))
-                .baseUrl(getPath(PathType.WEB_SERVICE_V2_RELEASE))
+                .baseUrl(getPath(PathType.WEB_SERVICE_V2_TEST))
                 .client(mOkHttpClient)
                 .addConverterFactory(XMLGsonConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
