@@ -204,20 +204,20 @@ public class RetrofitManager {
     }
 
 
-    //根据containerId获取蓝牙锁和BeidouNfc设备的该货物状态列表
-    public Observable<DeviceLocationInfos> getBleAndBeidouNfcDeviceLocationObservable(String token, String containerId) {
-        return freightTrackWebService.getBleAndBeidouNfcDeviceLocation(token, containerId, LanguageUtil.getLanguage())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
-    }
-
     /**
      * @description 北斗终端帽访问链路
      */
     //根据Token获取北斗终端帽的所有在途中的货物信息
     public Observable<BeidouMasterDeviceInfos> getBeidouMasterDeviceFreightListObservable(String token) {
         return freightTrackWebService.getBeidouMasterDeviceFreightList(token, LanguageUtil.getLanguage());
+    }
+
+    //根据containerId获取蓝牙锁和BeidouNfc设备的该货物状态列表
+    public Observable<DeviceLocationInfos> getBleAndBeidouNfcDeviceLocationObservable(String token, String containerId) {
+        return freightTrackWebService.getBleAndBeidouNfcDeviceLocation(token, containerId, LanguageUtil.getLanguage())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io());
     }
 
 //    //根据Token获取北斗终端帽的所有在途中的货物信息, 返回DeviceSearchSuggestion列表
@@ -250,7 +250,6 @@ public class RetrofitManager {
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .unsubscribeOn(Schedulers.io());
 //    }
-
 
     //根据implementID获取该货物状态列表
     public Observable<DeviceLocationInfos> getBeidouMasterDeviceLocationObservable(String token, String implementID) {

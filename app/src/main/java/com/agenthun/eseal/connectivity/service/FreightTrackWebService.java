@@ -114,21 +114,21 @@ public interface FreightTrackWebService {
             @Query("implementID") String implementID,
             @Query("language") String language);
 
-    //根据implementID获取北斗终端帽的该货物所选时间段的状态列表
-    @GET("GetImplementPositionInfoByIDAndTime")
-    Observable<DeviceLocationInfos> getBeidouMasterDeviceLocation(
-            @Query("token") String token,
-            @Query("implementID") String implementID,
-            @Query("startTime") String startTime,
-            @Query("endTime") String endTime,
-            @Query("language") String language);
+//    //根据implementID获取北斗终端帽的该货物所选时间段的状态列表
+//    @GET("GetImplementPositionInfoByIDAndTime")
+//    Observable<DeviceLocationInfos> getBeidouMasterDeviceLocation(
+//            @Query("token") String token,
+//            @Query("implementID") String implementID,
+//            @Query("startTime") String startTime,
+//            @Query("endTime") String endTime,
+//            @Query("language") String language);
 
-    //根据implementID获取北斗终端帽的该设备的最新货物状态
-    @GET("GetLastImplementData")
-    Observable<DeviceLocationInfos> getBeidouMasterDeviceLastLocation(
-            @Query("token") String token,
-            @Query("implementID") String implementID,
-            @Query("language") String language);
+//    //根据implementID获取北斗终端帽的该设备的最新货物状态
+//    @GET("GetLastImplementData")
+//    Observable<DeviceLocationInfos> getBeidouMasterDeviceLastLocation(
+//            @Query("token") String token,
+//            @Query("implementID") String implementID,
+//            @Query("language") String language);
 
     /**
      * @description 版本检测更新
