@@ -187,6 +187,11 @@ public class NfcDeviceFragment extends Fragment {
         lockConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (TextUtils.equals(lockNfcId.getText(), getString(R.string.text_hint_get_nfc_tag)) || lockNfcId.getText().toString().isEmpty()) {
+                    showSnackbar(getString(R.string.fail_device_nfc_tag));
+                    return;
+                }
+
                 foldingCellLock.toggle(false);
                 if (isLocationServiceStarting) {
                     locationService.stop();
@@ -226,6 +231,11 @@ public class NfcDeviceFragment extends Fragment {
         unlockConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (TextUtils.equals(lockNfcId.getText(), getString(R.string.text_hint_get_nfc_tag)) || lockNfcId.getText().toString().isEmpty()) {
+                    showSnackbar(getString(R.string.fail_device_nfc_tag));
+                    return;
+                }
+
                 foldingCellUnlock.toggle(false);
                 if (isLocationServiceStarting) {
                     locationService.stop();
