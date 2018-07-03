@@ -231,7 +231,7 @@ public class NfcDeviceFragment extends Fragment {
         unlockConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TextUtils.equals(lockNfcId.getText(), getString(R.string.text_hint_get_nfc_tag)) || lockNfcId.getText().toString().isEmpty()) {
+                if (TextUtils.equals(unlockNfcId.getText(), getString(R.string.text_hint_get_nfc_tag)) || unlockNfcId.getText().toString().isEmpty()) {
                     showSnackbar(getString(R.string.fail_device_nfc_tag));
                     return;
                 }

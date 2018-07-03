@@ -1,1 +1,2 @@
-include ':app', ':applite', ':versionupdate'
+// include ':app', ':applite', ':versionupdate'
+include ':app', ':versionupdate'
