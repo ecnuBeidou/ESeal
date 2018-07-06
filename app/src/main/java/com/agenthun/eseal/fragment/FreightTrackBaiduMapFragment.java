@@ -469,7 +469,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
 
                                         @Override
                                         public void onNext(List<LocationDetail> locationDetails) {
-                                            if (mOnItemClickListener != null && locationDetails != null && locationDetails.size() != 0) {
+                                            if (mOnItemClickListener != null && locationDetails != null) {
                                                 mOnItemClickListener.onItemClick(name, id, locationDetails);
                                             }
 

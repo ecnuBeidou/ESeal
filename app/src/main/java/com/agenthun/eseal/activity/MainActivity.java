@@ -162,6 +162,10 @@ public class MainActivity extends AppCompatActivity {
             public void onContainerDataChange(String containerNo, String containerId, List<LocationDetail> details) {
                 mContainerNo = containerNo;
                 mContainerId = containerId;
+
+                if (details == null) {
+                    details = new ArrayList<>() ;
+                }
                 mDetails = (ArrayList<LocationDetail>) details;
 
                 if (mContainerNo != null && mContainerId != null) {
