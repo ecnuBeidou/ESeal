@@ -189,8 +189,8 @@ public class RetrofitManager {
     }
 
     //关箱操作 - 获取MAC implementID="12345678"
-    public Observable<Result> closeDeviceObservable(String token, String implementID, String RFID, @Nullable String images, @Nullable String coordinate, String operateTime) {
-        return freightTrackWebService.closeDevice(token, implementID, RFID, images, coordinate, operateTime, LanguageUtil.getLanguage())
+    public Observable<Result> closeDeviceObservable(String token, String containerNo, String implementID, String RFID, @Nullable String images, @Nullable String coordinate, String operateTime) {
+        return freightTrackWebService.closeDevice(token, containerNo, implementID, RFID, images, coordinate, operateTime, LanguageUtil.getLanguage())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io());

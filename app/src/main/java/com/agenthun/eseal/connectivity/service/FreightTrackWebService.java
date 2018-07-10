@@ -74,6 +74,7 @@ public interface FreightTrackWebService {
     @GET("CloseContainer")
     Observable<Result> closeDevice(
             @Query("token") String token,
+            @Query("containerNo") String containerNo,
             @Query("implementID") String implementID,
             @Query("RFID") String RFID,
             @Nullable @Query("images") String images,

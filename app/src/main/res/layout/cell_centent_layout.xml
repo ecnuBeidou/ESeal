@@ -111,6 +111,15 @@
         android:text="@string/text_hint_get_nfc_tag"
         android:textSize="16sp" />
 
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/container_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/text_hint_freight_container_number"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLines="1" />
+
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/confirm_button"
         android:layout_width="match_parent"

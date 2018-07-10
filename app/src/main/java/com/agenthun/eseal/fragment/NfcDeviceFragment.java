@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -124,6 +125,8 @@ public class NfcDeviceFragment extends Fragment {
     private AppCompatTextView lockLocation;
     private AppCompatTextView lockNfcId;
 
+    private AppCompatEditText containerNumber;
+
     private View unlockAddDevicePicture;
     private ImageView unlockPicturePreview;
     private View unlockAddPicture;
@@ -192,6 +195,11 @@ public class NfcDeviceFragment extends Fragment {
                     return;
                 }
 
+                if (TextUtils.isEmpty(containerNumber.getText())) {
+                    showSnackbar(getString(R.string.text_hint_freight_query));
+                    return;
+                }
+
                 foldingCellLock.toggle(false);
                 if (isLocationServiceStarting) {
                     locationService.stop();
@@ -203,6 +211,8 @@ public class NfcDeviceFragment extends Fragment {
                 operationSealSwitch = STATE_OPERATION_INITIAL;
             }
         });
+
+        containerNumber = (AppCompatEditText) cellContentLockView.findViewById(R.id.container_number);
 
         ((AppCompatTextView) cellTitleUnlockView.findViewById(R.id.title)).setText(getString(R.string.card_title_unlock));
         ((ImageView) cellTitleUnlockView.findViewById(R.id.background)).setImageResource(R.drawable.cell_unlock);
@@ -572,7 +582,7 @@ public class NfcDeviceFragment extends Fragment {
             imgUrl = "";
 
             RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                    .closeDeviceObservable(token, "", tagId, imgUrl, coordinate, operateTime)
+                    .closeDeviceObservable(token, containerNumber.getText().toString(), "", tagId, imgUrl, coordinate, operateTime)
                     .subscribe(new Action1<Result>() {
                         @Override
                         public void call(Result result) {

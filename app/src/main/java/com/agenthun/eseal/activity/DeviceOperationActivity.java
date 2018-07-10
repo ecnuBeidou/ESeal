@@ -593,7 +593,7 @@ public class DeviceOperationActivity extends AppCompatActivity {
             imgUrl = "";
 
             RetrofitManager.builder(PathType.WEB_SERVICE_V2_TEST)
-                    .closeDeviceObservable(token, App.getDeviceId(), tagId, imgUrl, coordinate, operateTime)
+                    .closeDeviceObservable(token, "", App.getDeviceId(), tagId, imgUrl, coordinate, operateTime)
                     .subscribe(new Action1<Result>() {
                         @Override
                         public void call(Result result) {
