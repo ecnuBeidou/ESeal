@@ -224,14 +224,27 @@ public class ListViewLineChartActivity extends FragmentActivity {
             xAxis.setDrawGridLines(false);
             xAxis.setDrawAxisLine(true);
 
-            YAxis leftAxis = holder.chart.getAxisLeft();
-            leftAxis.setLabelCount(5, false);
-            leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+            if (position > 1) {
+                YAxis leftAxis = holder.chart.getAxisLeft();
+                leftAxis.setLabelCount(5, false);
+                leftAxis.setAxisMaximum(4f);
+                leftAxis.setAxisMinimum(-4f);
 
-            YAxis rightAxis = holder.chart.getAxisRight();
-            rightAxis.setLabelCount(5, false);
-            rightAxis.setDrawGridLines(false);
-            rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                YAxis rightAxis = holder.chart.getAxisRight();
+                rightAxis.setLabelCount(5, false);
+                rightAxis.setAxisMaximum(4f);
+                rightAxis.setAxisMinimum(-4f);
+            }
+            else {
+                YAxis leftAxis = holder.chart.getAxisLeft();
+                leftAxis.setLabelCount(5, false);
+                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                YAxis rightAxis = holder.chart.getAxisRight();
+                rightAxis.setLabelCount(5, false);
+                rightAxis.setDrawGridLines(false);
+                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+            }
 
             // set data
             holder.chart.setData((LineData) data);

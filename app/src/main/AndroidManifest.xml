@@ -102,7 +102,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.TextAppearance" />
 
-        <activity android:name=".activity.ListViewLineChartActivity"></activity>
+        <activity android:name=".activity.ListViewLineChartActivity"
+            android:screenOrientation="portrait" />
+
 
         <service android:name=".connectivity.manager.DownloadService" />
 
