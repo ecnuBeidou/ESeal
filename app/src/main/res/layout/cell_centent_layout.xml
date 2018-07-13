@@ -53,6 +53,18 @@
         android:text="@string/text_hint_lock_operation"
         android:textSize="24sp" />
 
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/container_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/spacing_double"
+        android:paddingRight="@dimen/spacing_double"
+        android:paddingTop="@dimen/spacing_double"
+        android:hint="@string/text_hint_freight_container_number"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLines="1" />
+
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -110,15 +122,6 @@
         android:paddingTop="@dimen/spacing_normal"
         android:text="@string/text_hint_get_nfc_tag"
         android:textSize="16sp" />
-
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/container_number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/text_hint_freight_container_number"
-        android:imeOptions="actionNext"
-        android:inputType="text"
-        android:maxLines="1" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/confirm_button"

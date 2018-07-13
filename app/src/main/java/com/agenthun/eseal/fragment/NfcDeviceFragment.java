@@ -258,6 +258,9 @@ public class NfcDeviceFragment extends Fragment {
             }
         });
 
+        AppCompatEditText containerNumber2 = (AppCompatEditText) cellContentUnlockView.findViewById(R.id.container_number);
+        containerNumber2.setVisibility(View.GONE);
+
         return view;
     }
 

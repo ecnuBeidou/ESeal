@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.app.AppCompatDialog;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -266,6 +267,9 @@ public class DeviceOperationActivity extends AppCompatActivity {
                 operationSealSwitch = STATE_OPERATION_INITIAL;
             }
         });
+
+        AppCompatEditText containerNumber = (AppCompatEditText) cellContentUnlockView.findViewById(R.id.container_number);
+        containerNumber.setVisibility(View.GONE);
 
         mUsingGoogleMap = "zh-CN".equals(LanguageUtil.getLanguage()) ? false : true;
 //        mUsingGoogleMap = true; //for test googleMap
