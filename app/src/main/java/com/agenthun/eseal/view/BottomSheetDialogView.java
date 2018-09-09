@@ -235,7 +235,7 @@ public class BottomSheetDialogView {
             String actionType = details.get(position).getUploadType();
             int securityLevel = Integer.parseInt(details.get(position).getSecurityLevel());
             switch (actionType) {
-                case "0": //周期上传
+                case "10": //周期上传
                     if (securityLevel == 2) { //非法打开
                         holder.securityLevelImageView.setImageResource(R.drawable.ic_warning_black_24dp);
                         holder.securityLevelImageView.setColorFilter(
@@ -322,7 +322,7 @@ public class BottomSheetDialogView {
         //获取相应的ActionType
         private String getActionType(String actionType) {
             switch (actionType) {
-                case "0": //周期上传
+                case "10": //周期上传
                     return mContext.getString(R.string.action_type_0);
                 case "100": //配置
                     return mContext.getString(R.string.action_type_100);

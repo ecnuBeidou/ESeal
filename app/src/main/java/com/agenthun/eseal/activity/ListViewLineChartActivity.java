@@ -24,7 +24,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,12 +77,14 @@ public class ListViewLineChartActivity extends FragmentActivity {
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
-            entries.add(new Entry(i, details.get(i).getTemperature()));
+            if (!(details.get(i).getUploadType().equals("101")  || details.get(i).getUploadType().equals("102"))) {
+                entries.add(new Entry(i, details.get(i).getTemperature()));
+            }
         }
 
         LineDataSet lineDataSet = new LineDataSet(entries, "温度");
         lineDataSet.setLineWidth(1f);
-        lineDataSet.setCircleRadius(4.5f);
+        lineDataSet.setCircleRadius(2.5f);
         lineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         lineDataSet.setDrawValues(false);
 
@@ -98,12 +99,14 @@ public class ListViewLineChartActivity extends FragmentActivity {
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
-            entries.add(new Entry(i, details.get(i).getHumidity()));
+            if (!(details.get(i).getUploadType().equals("101")  || details.get(i).getUploadType().equals("102"))) {
+                entries.add(new Entry(i, details.get(i).getHumidity()));
+            }
         }
 
         LineDataSet lineDataSet = new LineDataSet(entries, "湿度");
         lineDataSet.setLineWidth(1f);
-        lineDataSet.setCircleRadius(4.5f);
+        lineDataSet.setCircleRadius(2.5f);
         lineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         lineDataSet.setColor(Color.rgb(255, 208, 140));
         lineDataSet.setCircleColor(Color.rgb(255, 208, 140));
@@ -120,12 +123,14 @@ public class ListViewLineChartActivity extends FragmentActivity {
         ArrayList<Entry> xEntries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
-            xEntries.add(new Entry(i, details.get(i).getVibrationX()));
+            if (!(details.get(i).getUploadType().equals("101")  || details.get(i).getUploadType().equals("102"))) {
+                xEntries.add(new Entry(i, details.get(i).getVibrationX()));
+            }
         }
 
         LineDataSet xLineDataSet = new LineDataSet(xEntries, "振动X");
         xLineDataSet.setLineWidth(1f);
-        xLineDataSet.setCircleRadius(4.5f);
+        xLineDataSet.setCircleRadius(2.5f);
         xLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         xLineDataSet.setColor(Color.rgb(255, 247, 140));
         xLineDataSet.setCircleColor(Color.rgb(255, 247, 140));
@@ -142,12 +147,14 @@ public class ListViewLineChartActivity extends FragmentActivity {
         ArrayList<Entry> yEntries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
-            yEntries.add(new Entry(i, details.get(i).getVibrationY()));
+            if (!(details.get(i).getUploadType().equals("101")  || details.get(i).getUploadType().equals("102"))) {
+                yEntries.add(new Entry(i, details.get(i).getVibrationY()));
+            }
         }
 
         LineDataSet yLineDataSet = new LineDataSet(yEntries, "振动Y");
         yLineDataSet.setLineWidth(1f);
-        yLineDataSet.setCircleRadius(4.5f);
+        yLineDataSet.setCircleRadius(2.5f);
         yLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         yLineDataSet.setColor(Color.rgb(192, 255, 140));
         yLineDataSet.setCircleColor(Color.rgb(192, 255, 140));
@@ -164,12 +171,14 @@ public class ListViewLineChartActivity extends FragmentActivity {
         ArrayList<Entry> zEntries = new ArrayList<Entry>();
 
         for(int i = 0; i < details.size(); i++) {
-            zEntries.add(new Entry(i, details.get(i).getVibrationZ()));
+            if (!(details.get(i).getUploadType().equals("101")  || details.get(i).getUploadType().equals("102"))) {
+                zEntries.add(new Entry(i, details.get(i).getVibrationZ()));
+            }
         }
 
         LineDataSet zLineDataSet = new LineDataSet(zEntries, "振动Z");
         zLineDataSet.setLineWidth(1f);
-        zLineDataSet.setCircleRadius(4.5f);
+        zLineDataSet.setCircleRadius(2.5f);
         zLineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         zLineDataSet.setColor(Color.rgb(193, 37, 82));
         zLineDataSet.setCircleColor(Color.rgb(193, 37, 82));
@@ -209,11 +218,6 @@ public class ListViewLineChartActivity extends FragmentActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-//            if (!holder.chart.isEmpty()) {
-//                holder.chart.clearValues();
-//            }
-//            holder.chart.clear();
-
             // apply styling
             // holder.chart.setValueTypeface(mTf);
             holder.chart.getDescription().setEnabled(false);
@@ -227,13 +231,13 @@ public class ListViewLineChartActivity extends FragmentActivity {
             if (position > 1) {
                 YAxis leftAxis = holder.chart.getAxisLeft();
                 leftAxis.setLabelCount(5, false);
-                leftAxis.setAxisMaximum(4f);
-                leftAxis.setAxisMinimum(-4f);
+                leftAxis.setAxisMaximum(7f);
+                leftAxis.setAxisMinimum(-7f);
 
                 YAxis rightAxis = holder.chart.getAxisRight();
                 rightAxis.setLabelCount(5, false);
-                rightAxis.setAxisMaximum(4f);
-                rightAxis.setAxisMinimum(-4f);
+                rightAxis.setAxisMaximum(7f);
+                rightAxis.setAxisMinimum(-7f);
             }
             else {
                 YAxis leftAxis = holder.chart.getAxisLeft();
@@ -244,13 +248,17 @@ public class ListViewLineChartActivity extends FragmentActivity {
                 rightAxis.setLabelCount(5, false);
                 rightAxis.setDrawGridLines(false);
                 rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                if (position == 0) {
+                    leftAxis.setAxisMaximum(40f);
+                    rightAxis.setAxisMaximum(40f);
+                }
             }
 
             // set data
             holder.chart.setData((LineData) data);
 
-            // do not forget to refresh the chart
-            holder.chart.invalidate();
+//            holder.chart.invalidate();
 
             holder.chart.animateX(750);
 

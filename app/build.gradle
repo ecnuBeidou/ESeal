@@ -7,26 +7,14 @@ android {
         applicationId "com.agenthun.eseal"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 18
-        versionName "2.3"
+        versionCode 19
+        versionName "2.4"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-//        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = false } }
-
-//        multiDexEnabled true
-
     }
-
-//    compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_8
-//        targetCompatibility JavaVersion.VERSION_1_8
-//    }
 
     lintOptions {
         checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
         abortOnError false
     }
 
@@ -70,25 +58,6 @@ android {
             signingConfig signingConfigs.relealse
         }
     }
-
-//    //修改文件名
-//    applicationVariants.all { variant ->
-//        variant.outputs.each { output ->
-//            def outputFile = output.outputFile
-//            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-//                File outputDirectory = new File(outputFile.parent);
-//                def fileName
-//                if (variant.buildType.name == "release") {
-//                    fileName = "${getAppName()}_v_${formateVersionName(defaultConfig.versionName)}_${packageTime()}.apk"
-//
-//                } else if (variant.buildType.name == "debug") {
-//                    fileName = "${getAppName()}_v_${formateVersionName(defaultConfig.versionName)}_${packageTime()}-${getGitBranchName()}-debug.apk"
-//                }
-////                output.outputFile = new File(outputDirectory, fileName)
-//                output.outputFileName = fileName
-//            }
-//        }
-//    }
 
     repositories {
         maven { url "https://jitpack.io" }
@@ -153,7 +122,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:10.0.1'
     compile 'com.google.maps:google-maps-services:0.1.17'
 
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
     compile project(':versionupdate')
 }

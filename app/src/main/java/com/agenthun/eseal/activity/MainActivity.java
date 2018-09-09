@@ -25,11 +25,10 @@ import com.agenthun.eseal.App;
 import com.agenthun.eseal.R;
 import com.agenthun.eseal.adapter.SectionsPagerAdapter;
 import com.agenthun.eseal.bean.base.LocationDetail;
-import com.agenthun.eseal.connectivity.manager.RetrofitManager;
 import com.agenthun.eseal.utils.ApiLevelHelper;
 import com.agenthun.eseal.utils.PreferencesHelper;
-import com.agenthun.eseal.view.BottomSheetDialogTemperatureView;
 import com.agenthun.eseal.view.BottomSheetDialogView;
+import com.github.mikephil.charting.utils.Utils;
 import com.pekingopera.versionupdate.UpdateHelper;
 import com.pekingopera.versionupdate.listener.ForceListener;
 import com.umeng.analytics.MobclickAgent;
@@ -177,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Utils.init(this);
+
         checkUpdate();
     }
 
@@ -261,8 +262,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTemperaturesByBottomSheet(final String containerNo, ArrayList<LocationDetail> details) {
-//        BottomSheetDialogTemperatureView.show(MainActivity.this, containerNo, details);
-
         Intent i = ListViewLineChartActivity.newIntent(MainActivity.this, details);
         startActivity(i);
     }

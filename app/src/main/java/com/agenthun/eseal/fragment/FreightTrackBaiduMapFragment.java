@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.TimeUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.agenthun.eseal.App;
 import com.agenthun.eseal.R;
@@ -43,19 +43,13 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.baidu.mapapi.utils.SpatialRelationUtil;
-import com.google.maps.TimeZoneApi;
 import com.umeng.analytics.MobclickAgent;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -145,7 +139,7 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                     .subscribe(new Subscriber<List<DeviceSearchSuggestion>>() {
                         @Override
                         public void onCompleted() {
-
+                            Toast.makeText(getContext(), "Loading completed", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
