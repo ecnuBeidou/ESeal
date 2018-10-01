@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.agenthun.eseal.App;
 import com.agenthun.eseal.R;
@@ -262,6 +263,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTemperaturesByBottomSheet(final String containerNo, ArrayList<LocationDetail> details) {
+        if (details == null || details.size() < 2) {
+            Toast.makeText(this, "No data yet, please try it later.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent i = ListViewLineChartActivity.newIntent(MainActivity.this, details);
         startActivity(i);
     }

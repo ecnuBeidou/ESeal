@@ -138,8 +138,10 @@ public class FreightTrackBaiduMapFragment extends Fragment {
                     .getAllDeviceFreightListObservable(token)
                     .subscribe(new Subscriber<List<DeviceSearchSuggestion>>() {
                         @Override
-                        public void onCompleted() {
-                            Toast.makeText(getContext(), "Loading completed", Toast.LENGTH_SHORT).show();
+                            public void onCompleted() {
+                            if (getActivity()!= null && getActivity().getApplicationContext() != null) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Loading completed", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override

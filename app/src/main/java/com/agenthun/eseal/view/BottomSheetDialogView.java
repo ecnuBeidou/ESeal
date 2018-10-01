@@ -236,7 +236,7 @@ public class BottomSheetDialogView {
             int securityLevel = Integer.parseInt(details.get(position).getSecurityLevel());
             switch (actionType) {
                 case "10": //周期上传
-                    if (securityLevel == 2) { //非法打开
+                    if (securityLevel == 1) { //非法打开
                         holder.securityLevelImageView.setImageResource(R.drawable.ic_warning_black_24dp);
                         holder.securityLevelImageView.setColorFilter(
                                 ContextCompat.getColor(mContext, R.color.red_500));
@@ -254,7 +254,7 @@ public class BottomSheetDialogView {
                     break;
                 case "101": //上封
                     holder.securityLevelImageView.setImageResource(R.drawable.ic_lock_black_24dp);
-                    if (securityLevel == 2) { //非法状态
+                    if (securityLevel == 1) { //非法状态
                         holder.securityLevelImageView.setColorFilter(
                                 ContextCompat.getColor(mContext, R.color.red_500));
                     } else { //正常
@@ -264,7 +264,7 @@ public class BottomSheetDialogView {
                     break;
                 case "102": //解封
                     holder.securityLevelImageView.setImageResource(R.drawable.ic_lock_open_black_24dp);
-                    if (securityLevel == 2) { //非法状态
+                    if (securityLevel == 1) { //非法状态
                         holder.securityLevelImageView.setColorFilter(
                                 ContextCompat.getColor(mContext, R.color.red_500));
                     } else { //正常
