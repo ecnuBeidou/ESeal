@@ -250,8 +250,8 @@ public class ListViewLineChartActivity extends FragmentActivity {
                 rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
                 if (position == 0) {
-                    leftAxis.setAxisMaximum(40f);
-                    rightAxis.setAxisMaximum(40f);
+                    leftAxis.setAxisMaximum(50f);
+                    rightAxis.setAxisMaximum(50f);
                 }
             }
 
