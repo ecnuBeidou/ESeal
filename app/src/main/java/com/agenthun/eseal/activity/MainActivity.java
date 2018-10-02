@@ -32,6 +32,7 @@ import com.agenthun.eseal.view.BottomSheetDialogView;
 import com.github.mikephil.charting.utils.Utils;
 import com.pekingopera.versionupdate.UpdateHelper;
 import com.pekingopera.versionupdate.listener.ForceListener;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -263,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTemperaturesByBottomSheet(final String containerNo, ArrayList<LocationDetail> details) {
+
         if (details == null || details.size() < 2) {
             Toast.makeText(this, "No data yet, please try it later.", Toast.LENGTH_SHORT).show();
             return;

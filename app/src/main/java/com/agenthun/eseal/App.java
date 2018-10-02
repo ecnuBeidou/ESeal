@@ -7,6 +7,7 @@ import android.os.Vibrator;
 import com.agenthun.eseal.utils.baidumap.LocationService;
 import com.agenthun.eseal.utils.update.UpdateConfig;
 import com.baidu.mapapi.SDKInitializer;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * @project ESeal
@@ -29,6 +30,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         mApplicationContext = this;
+
+        CrashReport.initCrashReport(getApplicationContext(), "4ca4261bef", true);
 
         /***
          * 初始化版本升级模块

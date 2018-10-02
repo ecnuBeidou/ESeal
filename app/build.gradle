@@ -3,12 +3,13 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
 //    buildToolsVersion "25.0.1"
+
     defaultConfig {
         applicationId "com.agenthun.eseal"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 20
-        versionName "2.5"
+        versionCode 22
+        versionName "2.7"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -125,4 +126,6 @@ dependencies {
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
     compile project(':versionupdate')
+
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
 }
