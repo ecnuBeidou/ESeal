@@ -32,7 +32,7 @@ import okhttp3.Cache;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
+//import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -110,7 +110,7 @@ public class RetrofitManager {
             Log.e("OKHttp", "Could not create http cache", e);
         }
         mOkHttpClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+//                .addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .cookieJar(new CookieJarManager(mContext))
                 .cache(cache)
                 .addInterceptor(new CacheInterceptor(mContext))
@@ -221,37 +221,6 @@ public class RetrofitManager {
                 .unsubscribeOn(Schedulers.io());
     }
 
-//    //根据Token获取北斗终端帽的所有在途中的货物信息, 返回DeviceSearchSuggestion列表
-//    public Observable<List<DeviceSearchSuggestion>> getBeidouMasterDeviceFreightListWithFormatObservable(String token) {
-//        Observable<BeidouMasterDeviceInfos> beidouMasterDeviceInfos = getBeidouMasterDeviceFreightListObservable(token);
-//        return beidouMasterDeviceInfos
-//                .map(new Func1<BeidouMasterDeviceInfos, List<DeviceSearchSuggestion>>() {
-//                    @Override
-//                    public List<DeviceSearchSuggestion> call(BeidouMasterDeviceInfos beidouMasterDeviceInfos) {
-//                        List<DeviceSearchSuggestion> result = new ArrayList<>();
-//
-//                        if (beidouMasterDeviceInfos != null
-//                                && beidouMasterDeviceInfos.getResult().get(0).getRESULT() == 1) {
-//                            if (beidouMasterDeviceInfos.getResult().get(0).getICOUNT() == 0) {
-//                                return result;
-//                            }
-//                            List<BeidouMasterDevice> details = beidouMasterDeviceInfos.getDetails();
-//                            for (BeidouMasterDevice detail :
-//                                    details) {
-//                                Log.d(TAG, "getBeidouMasterDevice(): " + detail.toString());
-//                                DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail);
-//                                result.add(suggestion);
-//                            }
-//                        }
-//
-//                        return result;
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .unsubscribeOn(Schedulers.io());
-//    }
-
     //根据implementID获取该货物状态列表
     public Observable<DeviceLocationInfos> getBeidouMasterDeviceLocationObservable(String token, String implementID) {
         return freightTrackWebService.getBeidouMasterDeviceLocation(token, implementID, LanguageUtil.getLanguage())
@@ -259,203 +228,6 @@ public class RetrofitManager {
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io());
     }
-
-//    //根据implementID获取北斗终端帽的该货物所选时间段的状态列表
-//    public Observable<List<LocationDetail>> getBeidouMasterDeviceLocationObservable(String token, String id, String from, String to) {
-//        Observable<DeviceLocationInfos> deviceLocationInfos = freightTrackWebService
-//                .getBeidouMasterDeviceLocation(token, id, from, to, LanguageUtil.getLanguage());
-//
-//        return deviceLocationInfos
-//                .map(new Func1<DeviceLocationInfos, List<LocationDetail>>() {
-//                    @Override
-//                    public List<LocationDetail> call(DeviceLocationInfos deviceLocationInfos) {
-//                        List<LocationDetail> list = new ArrayList<>();
-//                        if (deviceLocationInfos != null
-//                                && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
-//
-//                            //查询无数据返回
-//                            if (deviceLocationInfos.getResult().get(0).getICOUNT() == 0) {
-//                                return list;
-//                            }
-//                            //GPS坐标转百度地图坐标
-////                    CoordinateConverter converter = new CoordinateConverter();
-////                    converter.from(CoordinateConverter.CoordType.GPS);
-//
-//                            for (DeviceLocation deviceLocation :
-//                                    deviceLocationInfos.getDetails()) {
-//                                String reportTime = deviceLocation.getReportTime();
-//                                String uploadType = deviceLocation.getUploadType();
-//                                String securityLevel = deviceLocation.getSecurityLevel();
-//                                String closedFlag = deviceLocation.getClosedFlag();
-//
-//                                String coordinate = deviceLocation.getBaiduCoordinate();
-//                                //去除无效数据
-//                                if (coordinate.isEmpty() || !coordinate.contains(",")) {
-//                                    continue;
-//                                }
-//
-//                                String[] location = coordinate.split(",");
-//                                LatLng latLng = new LatLng(
-//                                        Double.parseDouble(location[0]),
-//                                        Double.parseDouble(location[1])
-//                                );
-////                        converter.coord(latLng);
-////                        latLng = converter.convert();
-//
-//                                Float temperature;
-//                                try {
-//                                    temperature = Float.parseFloat(deviceLocation.getTemperature());
-//                                }
-//                                catch (Exception ex) {
-//                                    temperature = 0f;
-//                                }
-//
-//                                Float humidity;
-//                                try {
-//                                    humidity = Float.parseFloat(deviceLocation.getHumidity());
-//                                }
-//                                catch (Exception ex) {
-//                                    humidity = 0f;
-//                                }
-//
-//                                Float vibarationX;
-//                                Float vibarationY;
-//                                Float vibarationZ;
-//                                try {
-//                                    String vibrationString[] = deviceLocation.getVibration().split(",");
-//                                    vibarationX = Float.parseFloat(vibrationString[0]);
-//                                    vibarationY = Float.parseFloat(vibrationString[1]);
-//                                    vibarationZ = Float.parseFloat(vibrationString[2]);
-//                                }
-//                                catch (Exception ex) {
-//                                    vibarationX = 0f;
-//                                    vibarationY = 0f;
-//                                    vibarationZ = 0f;
-//                                }
-//
-//                                LocationDetail d = new LocationDetail(reportTime,
-//                                        uploadType,
-//                                        securityLevel,
-//                                        closedFlag,
-//                                        latLng,
-//                                        temperature,
-//                                        humidity,
-//                                        vibarationX,
-//                                        vibarationY,
-//                                        vibarationZ);
-//
-//                                list.add(d);
-//                            }
-//                        }
-//                        return list;
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .unsubscribeOn(Schedulers.io());
-//
-///*
-//        //构造测试数据
-//        List<LocationDetail> list = new ArrayList<>();
-//        for (int i = 0; i < 100; i++) {
-//            LocationDetail detail = new LocationDetail("2017/02/14 13:14:51", "0", String.valueOf(2), "1", new LatLng(45.6406300000 + Math.cos(i / 39.9f), -73.8472210000 + Math.cos(i / 99.9f)));
-//            list.add(detail);
-//        }
-//        return Observable
-//                .just(list)
-//                .delay(3000, TimeUnit.MILLISECONDS);*/
-//    }
-
-//    //根据implementID获取北斗终端帽的该设备的最新货物状态
-//    public Observable<LocationDetail> getBeidouMasterDeviceLastLocationObservable(String token, String id) {
-//        Observable<DeviceLocationInfos> deviceLocationInfos = freightTrackWebService.getBeidouMasterDeviceLastLocation(token, id, LanguageUtil.getLanguage());
-//
-//        return deviceLocationInfos
-//                .map(new Func1<DeviceLocationInfos, LocationDetail>() {
-//                    @Override
-//                    public LocationDetail call(DeviceLocationInfos deviceLocationInfos) {
-//                        if (deviceLocationInfos != null
-//                                && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
-//                            DeviceLocation deviceLocation = deviceLocationInfos.getDetails().get(0); //最新位置点
-//
-//                            //GPS坐标转百度地图坐标
-////                    CoordinateConverter converter = new CoordinateConverter();
-////                    converter.from(CoordinateConverter.CoordType.GPS);
-//
-//                            String reportTime = deviceLocation.getReportTime();
-//                            String uploadType = deviceLocation.getUploadType();
-//                            String securityLevel = deviceLocation.getSecurityLevel();
-//                            String closedFlag = deviceLocation.getClosedFlag();
-//                            String[] location = deviceLocation.getBaiduCoordinate().split(",");
-//                            LatLng latLng = new LatLng(
-//                                    Double.parseDouble(location[0]),
-//                                    Double.parseDouble(location[1])
-//                            );
-////                    converter.coord(latLng);
-////                    latLng = converter.convert();
-//
-////                            LocationDetail d = new LocationDetail(reportTime,
-////                                    uploadType,
-////                                    securityLevel,
-////                                    closedFlag,
-////                                    latLng);
-//
-//                            Float temperature;
-//                            try {
-//                                temperature = Float.parseFloat(deviceLocation.getTemperature());
-//                            }
-//                            catch (Exception ex) {
-//                                temperature = 0f;
-//                            }
-//
-//                            Float humidity;
-//                            try {
-//                                humidity = Float.parseFloat(deviceLocation.getHumidity());
-//                            }
-//                            catch (Exception ex) {
-//                                humidity = 0f;
-//                            }
-//
-//                            Float vibarationX;
-//                            Float vibarationY;
-//                            Float vibarationZ;
-//                            try {
-//                                String vibrationString[] = deviceLocation.getVibration().split(",");
-//                                vibarationX = Float.parseFloat(vibrationString[0]);
-//                                vibarationY = Float.parseFloat(vibrationString[1]);
-//                                vibarationZ = Float.parseFloat(vibrationString[2]);
-//                            }
-//                            catch (Exception ex) {
-//                                vibarationX = 0f;
-//                                vibarationY = 0f;
-//                                vibarationZ = 0f;
-//                            }
-//
-//                            LocationDetail d = new LocationDetail(reportTime,
-//                                    uploadType,
-//                                    securityLevel,
-//                                    closedFlag,
-//                                    latLng,
-//                                    temperature,
-//                                    humidity,
-//                                    vibarationX,
-//                                    vibarationY,
-//                                    vibarationZ);
-//
-//                            return d;
-//                        }
-//                        return null;
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .unsubscribeOn(Schedulers.io());
-//
-///*        //构造测试数据
-//        return Observable
-//                .just(new LocationDetail("2017/02/14 13:14:51", "0", "1", "1", new LatLng(45.6406300000, -73.8472210000)))
-//                .delay(500, TimeUnit.MILLISECONDS);*/
-//    }
 
     /**
      * @description 获取所有终端(蓝牙锁、北斗终端NFC、北斗终端帽)的货物信息
@@ -470,6 +242,11 @@ public class RetrofitManager {
             @Override
             public List<DeviceSearchSuggestion> call(BleAndBeidouNfcDeviceInfos bleAndBeidouNfcDeviceInfos, BeidouMasterDeviceInfos beidouMasterDeviceInfos) {
                 List<DeviceSearchSuggestion> result = new ArrayList<DeviceSearchSuggestion>();
+
+                // Token timeout
+                if (bleAndBeidouNfcDeviceInfos.getResult().get(0).getRESULT() == 0 && bleAndBeidouNfcDeviceInfos.getResult().get(0).getEFFECTIVETOKEN() == 0) {
+                    // Need to find a way to notify users.
+                }
 
                 if (bleAndBeidouNfcDeviceInfos != null &&
                         bleAndBeidouNfcDeviceInfos.getResult().get(0).getRESULT() == 1) {
@@ -552,42 +329,6 @@ public class RetrofitManager {
                 .unsubscribeOn(Schedulers.io());*/
     }
 
-    //APP Lite 版本检测更新
-    public Observable<UpdateResponse.Entity> checkAppLiteUpdateObservable() {
-        Observable<UpdateResponse> response = freightTrackWebService.checkAppLiteUpdate();
-        return response.map(new Func1<UpdateResponse, UpdateResponse.Entity>() {
-            @Override
-            public UpdateResponse.Entity call(UpdateResponse updateResponse) {
-                if (updateResponse == null) {
-                    return null;
-                }
-                if (updateResponse.getError() == null || updateResponse.getError().getResult() != 1) {
-                    return null;
-                }
-                if (updateResponse.getEntity() != null) {
-                    return updateResponse.getEntity();
-                }
-                return null;
-            }
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());
-
-        //构造测试数据
-/*        String testDownloadUrl = "http://www.freight-track.com/files/ESeal_Lite_v_1_0_3_2017-02-25.apk";
-        return Observable
-                .just(new UpdateResponse.Entity(12537361, false,
-                        "1.谷歌地图更新\r\n2.UI更新",
-                        testDownloadUrl,
-                        100,
-                        "x.0.x"))
-                .delay(100, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io());*/
-    }
-
     /**
      * @description 下载文件
      */
@@ -599,23 +340,4 @@ public class RetrofitManager {
                 .unsubscribeOn(Schedulers.io());
     }
 
-    public void downloadFileObservable(@Url String fileUrl, String fileName, DownloadCallBack callBack) {
-        freightTrackWebService.downloadFile(fileUrl)
-                .compose(schedulersTransformer())
-                .subscribe(new DownloadSubscriber<ResponseBody>(mContext, fileName, callBack));
-    }
-
-    /**
-     * @description 进程调度
-     */
-    Observable.Transformer schedulersTransformer() {
-        return new Observable.Transformer() {
-            @Override
-            public Object call(Object o) {
-                return ((Observable) o).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .unsubscribeOn(Schedulers.io());
-            }
-        };
-    }
 }
